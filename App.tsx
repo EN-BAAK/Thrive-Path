@@ -4,7 +4,7 @@ function App() {
   return (
     <View style={styles.container}>
       <View>
-        <Text>Hello world</Text>
+        <Text>Hello world x</Text>
       </View>
     </View>
   );
