@@ -1,6 +1,9 @@
 import { getDatabase } from '../db';
 import { Goal } from '../../types/schemas';
 import initializeTableFunctions from '../../misc/database';
+import { initializeDatabase } from '../schema';
+
+initializeDatabase()
 
 const TABLE_NAME = 'goals';
 const isTimestamp = true;
@@ -8,7 +11,6 @@ const isTimestamp = true;
 export const createGoal = async (goal: Goal) => {
   try {
     const goalsDB = await initializeTableFunctions(getDatabase, TABLE_NAME)
-
     return await goalsDB.insert(goal, isTimestamp);
   } catch (error) {
     console.error('[CREATE_GOAL] Error:', error);

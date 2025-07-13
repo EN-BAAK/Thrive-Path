@@ -1,19 +1,14 @@
-import { StyleSheet, View, Text } from 'react-native';
+import React from 'react';
+import { View } from 'react-native';
+import Goals from './src/pages/Goals';
+import framework from './src/styles/framework';
 
-function App() {
+function App(): React.JSX.Element {
   return (
-    <View style={styles.container}>
-      <View>
-        <Text>Hello world x</Text>
-      </View>
+    <View style={[framework.flexOne, framework.bgLight]}>
+      <Goals />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
 
 export default App;

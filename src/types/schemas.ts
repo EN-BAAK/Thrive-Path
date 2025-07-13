@@ -1,10 +1,10 @@
 export type Goal = {
-  id?: number;
+  id: number;
   name: string;
   description?: string;
   flag?: boolean;
-  points?: number;
-  deadline?: string;
-  createdAt?: string;
-  updatedAt?: string;
+  points: number;
+  deadline: string;
+  createdAt: string;
+  updatedAt: string;
 };

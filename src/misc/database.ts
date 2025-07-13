@@ -23,13 +23,14 @@ class DatabaseFunctions {
         valuesObj.updatedAt = updatedAt;
       }
 
-      const fields = Object.keys(valuesObj);
+      const fields = Object.keys(valuesObj).filter(key => key !== "id");
       const placeholders = fields.map(() => '?').join(', ');
       const values = fields.map((key) => {
         const val = valuesObj[key];
         if (typeof val === 'boolean') return booleanToNumber(val);
         return val;
       });
+
 
       await this.db.executeSql(
         `INSERT INTO ${this.table} (${fields.join(', ')}) VALUES (${placeholders})`,
