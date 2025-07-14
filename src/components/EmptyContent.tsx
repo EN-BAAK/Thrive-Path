@@ -10,9 +10,10 @@ const EmptyContent: React.FC<EmptyContentProps> = ({
   onButtonPress,
 }) => {
   return (
-    <View style={[framework.flexCenter, framework.flexOne, framework.py5]}>
+    <View style={[framework.flexOne, framework.py5, framework.flexCenter]}>
       <Text
         style={[
+          framework.textCapitalize,
           framework.textCenter,
           framework.fontSemiBold,
           framework.textLg,
@@ -38,7 +39,7 @@ const EmptyContent: React.FC<EmptyContentProps> = ({
             framework.rounded,
           ]}
         >
-          <Text style={[framework.textWhite, framework.textBase]}>
+          <Text style={[framework.textWhite, framework.textBase, framework.textCapitalize]}>
             {buttonText}
           </Text>
         </TouchableOpacity>

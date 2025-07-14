@@ -1,5 +1,5 @@
-import { Goal } from "./schemas"
-
-export type GoalCard = {
-  goal: Goal
+export type CardProps<T> = {
+  record: T,
+  onSuccess?: () => void,
+  onEdit?: () => void,
 }

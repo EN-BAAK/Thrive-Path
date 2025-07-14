@@ -358,6 +358,9 @@ const radii: NamedStyles<any> = {
 const textFormat: NamedStyles<any> = {
   textCenter: {
     textAlign: "center"
+  },
+  textCapitalize: {
+    textTransform: "capitalize"
   }
 }
 

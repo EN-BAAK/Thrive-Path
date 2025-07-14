@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Modal,
   View,
@@ -21,14 +21,14 @@ const AddEditGoalModal: React.FC<AddEditGoalModalProps> = ({
   onSave,
   initialGoal,
 }) => {
-  const handleSubmit = (values: any) => {
+  const handleSubmittingGoal = (values: any) => {
     const newGoal: Goal = {
       ...initialGoal,
       id: initialGoal?.id || -1,
       name: values.name.trim(),
       description: values.description?.trim(),
       points: parseInt(values.points, 10),
-      deadline: values.deadLine,
+      deadline: values.deadline,
       flag: values.flag,
       createdAt: initialGoal?.createdAt || new Date(Date.now()).toISOString(),
       updatedAt: initialGoal?.updatedAt || new Date(Date.now()).toISOString()
@@ -37,6 +37,9 @@ const AddEditGoalModal: React.FC<AddEditGoalModalProps> = ({
     onSave(newGoal);
     onClose();
   };
+
+  useEffect(() => {
+  }, [initialGoal, visible])
 
   return (
     <Modal animationType="slide" transparent visible={visible}>
@@ -57,7 +60,7 @@ const AddEditGoalModal: React.FC<AddEditGoalModalProps> = ({
               updatedAt: new Date().toISOString()
             }}
             validationSchema={addEditGoalValidation}
-            onSubmit={handleSubmit}
+            onSubmit={handleSubmittingGoal}
             enableReinitialize
           >
             {({ handleSubmit }) => (
