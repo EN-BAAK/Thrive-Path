@@ -1,14 +1,11 @@
 import React from 'react';
-import { View } from 'react-native';
-import Goals from './src/pages/Goals';
-import framework from './src/styles/framework';
+import { NavigationContainer } from '@react-navigation/native';
+import DrawerNavigator from './src/navigation/DrawerNavigator';
 
-function App(): React.JSX.Element {
+export default function App() {
   return (
-    <View style={[framework.flexOne, framework.bgLight]}>
-      <Goals />
-    </View>
+    <NavigationContainer>
+      <DrawerNavigator />
+    </NavigationContainer>
   );
 }
-
-export default App;

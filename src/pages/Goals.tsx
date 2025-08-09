@@ -1,52 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, View, TouchableOpacity, Text } from 'react-native';
 import { Goal } from '../types/schemas';
-import { getGoals, createGoal, updateGoal } from '../api/crud/goals';
+import { findAllGoals } from '../api/crud/goals';
 import GoalCard from '../components/cards/Goal';
 import Loading from './Loading';
 import EmptyContent from '../components/EmptyContent';
 import AddEditGoalModal from '../components/modals/AddEditGoal';
 import framework from '../styles/framework';
-
-const defaultGoal: Goal = {
-  id: -1,
-  name: "",
-  description: "",
-  points: 0,
-  deadline: new Date(Date.now()).toISOString(),
-  flag: false,
-  createdAt: new Date(Date.now()).toISOString(),
-  updatedAt: new Date(Date.now()).toISOString(),
-}
+import { defaultGoal } from '../constants/formValues';
 
 const Goals: React.FC = (): React.JSX.Element => {
   const [goals, setGoals] = useState<Goal[]>([]);
-  const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null)
+  const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchGoals = async () => {
     try {
-      setIsLoading(true)
-      const data = await getGoals();
+      setIsLoading(true);
+      const data = await findAllGoals();
       setGoals(data);
     } catch (error) {
       console.error('[GOALS] Failed to load goals:', error);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleSaveGoal = async (goal: Goal) => {
-    try {
-      if (!selectedGoal) return
-      if (selectedGoal.id === -1)
-        await createGoal(goal);
-      else
-        await updateGoal(selectedGoal.id, goal)
-
-      fetchGoals();
-    } catch (error) {
-      console.error('[GOALS] Failed to save goal:', error);
     }
   };
 
@@ -56,26 +32,32 @@ const Goals: React.FC = (): React.JSX.Element => {
 
   if (isLoading) return <Loading />;
 
-  if (!goals.length)
+  if (!goals.length) {
     return (
       <>
         <EmptyContent
-          message="There is no goals yet"
+          message="There are no goals yet"
           buttonText="Add your first goal"
           onButtonPress={() => setSelectedGoal(defaultGoal)}
         />
-        <AddEditGoalModal
-          visible={selectedGoal ? true : false}
-          onClose={() => setSelectedGoal(null)}
-          onSave={handleSaveGoal}
-          initialGoal={selectedGoal!}
-        />
+        {selectedGoal && (
+          <AddEditGoalModal
+            visible
+            onClose={() => setSelectedGoal(null)}
+            onSave={fetchGoals}
+            initialGoal={selectedGoal}
+          />
+        )}
       </>
     );
+  }
 
   return (
     <View style={[framework.flexOne]}>
-      <ScrollView style={[framework.px2]} contentContainerStyle={[framework.py2]}>
+      <ScrollView
+        style={[framework.px2]}
+        contentContainerStyle={[framework.py2]}
+      >
         {goals.map((goal) => (
           <GoalCard
             key={goal.id}
@@ -98,15 +80,19 @@ const Goals: React.FC = (): React.JSX.Element => {
         ]}
         onPress={() => setSelectedGoal(defaultGoal)}
       >
-        <Text style={[framework.textWhite, framework.fontBold]}>+ Add Goal</Text>
+        <Text style={[framework.textWhite, framework.fontBold]}>
+          + Add Goal
+        </Text>
       </TouchableOpacity>
 
-      <AddEditGoalModal
-        visible={selectedGoal ? true : false}
-        onClose={() => setSelectedGoal(null)}
-        onSave={handleSaveGoal}
-        initialGoal={selectedGoal!}
-      />
+      {selectedGoal && (
+        <AddEditGoalModal
+          visible
+          onClose={() => setSelectedGoal(null)}
+          onSave={fetchGoals}
+          initialGoal={selectedGoal}
+        />
+      )}
     </View>
   );
 };

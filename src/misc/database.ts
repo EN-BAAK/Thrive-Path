@@ -1,6 +1,6 @@
 import { SQLiteDatabase } from 'react-native-sqlite-storage';
 import { booleanToNumber } from './helpers';
-import { Condition } from '../types/variables';
+import { Condition, ColumnSelection, JoinInput } from '../types/variables';
 
 class DatabaseFunctions {
   private table: string;
@@ -15,7 +15,6 @@ class DatabaseFunctions {
     try {
       const createdAt = isTimestamp ? new Date().toISOString() : undefined;
       const updatedAt = isTimestamp ? createdAt : undefined;
-
       const valuesObj = { ...record };
 
       if (isTimestamp) {
@@ -23,14 +22,12 @@ class DatabaseFunctions {
         valuesObj.updatedAt = updatedAt;
       }
 
-      const fields = Object.keys(valuesObj).filter(key => key !== "id");
+      const fields = Object.keys(valuesObj).filter(key => key !== 'id');
       const placeholders = fields.map(() => '?').join(', ');
       const values = fields.map((key) => {
         const val = valuesObj[key];
-        if (typeof val === 'boolean') return booleanToNumber(val);
-        return val;
+        return typeof val === 'boolean' ? booleanToNumber(val) : val;
       });
-
 
       await this.db.executeSql(
         `INSERT INTO ${this.table} (${fields.join(', ')}) VALUES (${placeholders})`,
@@ -42,22 +39,68 @@ class DatabaseFunctions {
     }
   }
 
-  async findAll<T>(conditions: Condition[] = [], orderBy?: string): Promise<T[]> {
+  private buildJoinClause(joins?: JoinInput[]): string {
+    if (!joins?.length) return '';
+    return joins.map(
+      join => ` ${join.type ?? 'LEFT'} JOIN ${join.through} ON ${join.on}`
+    ).join('');
+  }
+
+  private buildSelectClause(
+    mainColumns?: ColumnSelection[],
+    joins?: JoinInput[]
+  ): string {
+    const selections: string[] = [];
+
+    if (!mainColumns?.length) {
+      selections.push(`${this.table}.*`);
+    } else {
+      selections.push(
+        ...mainColumns.map(
+          col => `${this.table}.${col.column} AS ${col.alias ?? `${this.table}_${col.column}`}`
+        )
+      );
+    }
+
+    if (joins?.length) {
+      for (const join of joins) {
+        if (!join.columns?.length) {
+          selections.push(`${join.through}.*`);
+        } else {
+          selections.push(
+            ...join.columns.map(
+              col => `${join.through}.${col.column} AS ${col.alias ?? `${join.through}_${col.column}`}`
+            )
+          );
+        }
+      }
+    }
+
+    return selections.join(', ');
+  }
+
+  async findAll<T>(
+    conditions: Condition[] = [],
+    orderBy?: string,
+    joins?: JoinInput[],
+    columns?: ColumnSelection[]
+  ): Promise<T[]> {
     try {
-      let query = `SELECT * FROM ${this.table}`;
+      const selectClause = this.buildSelectClause(columns, joins);
+      const joinClause = this.buildJoinClause(joins);
+
+      let query = `SELECT ${selectClause} FROM ${this.table}${joinClause}`;
       const values: any[] = [];
 
       if (conditions.length) {
-        const whereClauses = conditions.map(
-          (cond) => `${cond.field} ${cond.operator ?? '='} ?`
-        );
-        query += ' WHERE ' + whereClauses.join(' AND ');
-        values.push(...conditions.map((c) => c.value));
+        const whereClause = conditions.map(
+          cond => `${cond.table ?? this.table}.${cond.field} ${cond.operator ?? '='} ?`
+        ).join(' AND ');
+        query += ` WHERE ${whereClause}`;
+        values.push(...conditions.map(cond => cond.value));
       }
 
-      if (orderBy) {
-        query += ` ORDER BY ${orderBy}`;
-      }
+      if (orderBy) query += ` ORDER BY ${orderBy}`;
 
       const [results] = await this.db.executeSql(query, values);
       const data: T[] = [];
@@ -73,18 +116,40 @@ class DatabaseFunctions {
     }
   }
 
-  async findOne<T>(conditions: Condition[]): Promise<T | null> {
-    try {
-      const results = await this.findAll<T>(conditions);
-      return results[0] ?? null;
-    } catch (error) {
-      console.error(`[FIND_ONE][${this.table}] Error:`, error);
-      throw error;
-    }
+  async findOne<T>(
+    conditions: Condition[],
+    joins?: JoinInput[],
+    columns?: ColumnSelection[]
+  ): Promise<T | null> {
+    const result = await this.findAll<T>(conditions, undefined, joins, columns);
+    return result[0] ?? null;
   }
 
   async findByPk<T>(id: number): Promise<T | null> {
     return this.findOne<T>([{ field: 'id', value: id }]);
+  }
+
+  async update(id: number, updates: Partial<any>) {
+    try {
+      const updatedAt = new Date().toISOString();
+      const fields: string[] = [];
+      const values: any[] = [];
+
+      for (const key in updates) {
+        fields.push(`${key} = ?`);
+        values.push((updates as any)[key]);
+      }
+
+      fields.push('updatedAt = ?');
+      values.push(updatedAt);
+      values.push(id);
+
+      const query = `UPDATE ${this.table} SET ${fields.join(', ')} WHERE id = ?`;
+      await this.db.executeSql(query, values);
+    } catch (error) {
+      console.error(`[UPDATE][${this.table}] Error:`, error);
+      throw error;
+    }
   }
 
   async deleteById(id: number) {
@@ -99,42 +164,13 @@ class DatabaseFunctions {
   async delete(conditions: Condition[]) {
     try {
       if (!conditions.length) return;
-
       const where = conditions.map(
-        (cond) => `${cond.field} ${cond.operator ?? '='} ?`
+        cond => `${cond.field} ${cond.operator ?? '='} ?`
       ).join(' AND ');
-
-      const values = conditions.map((c) => c.value);
-
+      const values = conditions.map(cond => cond.value);
       await this.db.executeSql(`DELETE FROM ${this.table} WHERE ${where}`, values);
     } catch (error) {
       console.error(`[DELETE][${this.table}] Error:`, error);
-      throw error;
-    }
-  }
-
-  async update(id: number, updates: Partial<any>) {
-    try {
-      const updatedAt = new Date().toISOString();
-
-      const fields: string[] = [];
-      const values: any[] = [];
-
-      for (const key in updates) {
-        fields.push(`${key} = ?`);
-        values.push((updates as any)[key]);
-      }
-
-      fields.push('updatedAt = ?');
-      values.push(updatedAt);
-      values.push(id);
-
-      await this.db.executeSql(
-        `UPDATE ${this.table} SET ${fields.join(', ')} WHERE id = ?`,
-        values
-      );
-    } catch (error) {
-      console.error(`[UPDATE][${this.table}] Error:`, error);
       throw error;
     }
   }
@@ -145,9 +181,7 @@ const initializeTableFunctions = async (
   tableName: string
 ): Promise<DatabaseFunctions> => {
   const db = await getDatabase();
-  const obj = new DatabaseFunctions(tableName, db)
-
-  return obj;
+  return new DatabaseFunctions(tableName, db);
 };
 
 export default initializeTableFunctions;

@@ -1,16 +1,17 @@
 import { getDatabase } from '../db';
-import { Goal } from '../../types/schemas';
+import { Goal, GoalWCategory, SafetyGoal } from '../../types/schemas';
 import initializeTableFunctions from '../../misc/database';
 import { initializeDatabase } from '../schema';
+import { Condition } from '../../types/variables';
 
-initializeDatabase()
+initializeDatabase();
 
 const TABLE_NAME = 'goals';
 const isTimestamp = true;
 
-export const createGoal = async (goal: Goal) => {
+export const createGoal = async (goal: SafetyGoal) => {
   try {
-    const goalsDB = await initializeTableFunctions(getDatabase, TABLE_NAME)
+    const goalsDB = await initializeTableFunctions(getDatabase, TABLE_NAME);
     return await goalsDB.insert(goal, isTimestamp);
   } catch (error) {
     console.error('[CREATE_GOAL] Error:', error);
@@ -18,11 +19,37 @@ export const createGoal = async (goal: Goal) => {
   }
 };
 
-export const getGoals = async (): Promise<Goal[]> => {
+export const findAllGoals = async (): Promise<GoalWCategory[]> => {
   try {
-    const goalsDB = await initializeTableFunctions(getDatabase, TABLE_NAME)
-
-    return await goalsDB.findAll<Goal>([], 'createdAt DESC');
+    const goalsDB = await initializeTableFunctions(getDatabase, TABLE_NAME);
+    return await goalsDB.findAll<GoalWCategory>(
+      [],
+      'goals.createdAt DESC',
+      [
+        {
+          through: 'categories',
+          on: 'goals.categoryId = categories.id',
+          type: 'LEFT',
+          columns: [
+            { column: 'name', alias: 'categoryName' },
+            { column: 'color', alias: 'categoryColor' }
+          ]
+        }
+      ],
+      [
+        { column: 'id' },
+        { column: 'name' },
+        { column: 'description' },
+        { column: 'isImportant' },
+        { column: 'points' },
+        { column: 'deadline' },
+        { column: 'status' },
+        { column: 'priority' },
+        { column: 'categoryId' },
+        { column: 'createdAt' },
+        { column: 'updatedAt' }
+      ]
+    );
   } catch (error) {
     console.error('[GET_GOALS] Error:', error);
     throw error;
@@ -31,8 +58,7 @@ export const getGoals = async (): Promise<Goal[]> => {
 
 export const updateGoal = async (id: number, updates: Partial<Goal>) => {
   try {
-    const goalsDB = await initializeTableFunctions(getDatabase, TABLE_NAME)
-
+    const goalsDB = await initializeTableFunctions(getDatabase, TABLE_NAME);
     return await goalsDB.update(id, updates);
   } catch (error) {
     console.error('[UPDATE_GOAL] Error:', error);
@@ -42,8 +68,7 @@ export const updateGoal = async (id: number, updates: Partial<Goal>) => {
 
 export const deleteGoal = async (id: number) => {
   try {
-    const goalsDB = await initializeTableFunctions(getDatabase, TABLE_NAME)
-
+    const goalsDB = await initializeTableFunctions(getDatabase, TABLE_NAME);
     return await goalsDB.deleteById(id);
   } catch (error) {
     console.error('[DELETE_GOAL] Error:', error);
@@ -51,21 +76,45 @@ export const deleteGoal = async (id: number) => {
   }
 };
 
-export const findGoalById = async (id: number): Promise<Goal | null> => {
+export const findGoalById = async (id: number): Promise<GoalWCategory | null> => {
   try {
-    const goalsDB = await initializeTableFunctions(getDatabase, TABLE_NAME)
-
-    return await goalsDB.findByPk<Goal>(id);
+    const goalsDB = await initializeTableFunctions(getDatabase, TABLE_NAME);
+    return await goalsDB.findOne<GoalWCategory>(
+      [{ field: 'id', value: id }],
+      [
+        {
+          through: 'categories',
+          on: 'goals.categoryId = categories.id',
+          type: 'LEFT',
+          columns: [
+            { column: 'name', alias: 'categoryName' },
+            { column: 'color', alias: 'categoryColor' }
+          ]
+        }
+      ],
+      [
+        { column: 'id' },
+        { column: 'name' },
+        { column: 'description' },
+        { column: 'isImportant' },
+        { column: 'points' },
+        { column: 'deadline' },
+        { column: 'status' },
+        { column: 'priority' },
+        { column: 'categoryId' },
+        { column: 'createdAt' },
+        { column: 'updatedAt' }
+      ]
+    );
   } catch (error) {
     console.error('[FIND_GOAL_BY_ID] Error:', error);
     throw error;
   }
 };
 
-export const findGoal = async (conditions: any[]): Promise<Goal | null> => {
+export const findGoal = async (conditions: Condition[]): Promise<Goal | null> => {
   try {
-    const goalsDB = await initializeTableFunctions(getDatabase, TABLE_NAME)
-
+    const goalsDB = await initializeTableFunctions(getDatabase, TABLE_NAME);
     return await goalsDB.findOne<Goal>(conditions);
   } catch (error) {
     console.error('[FIND_GOAL] Error:', error);

@@ -1,9 +1,31 @@
 import { TextStyle, ViewStyle } from "react-native";
 
+type Operation = '=' | '!=' | '<' | '<=' | '>' | '>=' | 'LIKE';
+type JoinTypes = 'INNER' | 'LEFT' | 'RIGHT' | 'FULL';
+export type Status = "PENDING" | "COMPLETED" | "CANCELED"
+
 export interface Condition {
+  table?: string;
   field: string;
-  operator?: '=' | '!=' | '<' | '<=' | '>' | '>=' | 'LIKE';
+  operator?: Operation
   value: any;
 }
 
 export type NamedStyles<T> = { [P in keyof T]: ViewStyle | TextStyle };
+
+export type JoinInput = {
+  through: string;
+  columns?: ColumnSelection[];
+  on: string;
+  type?: JoinTypes;
+};
+
+export type ColumnSelection = {
+  column: string;
+  alias?: string;
+};
+
+export type SelectOption = {
+  label: string;
+  value: any;
+};

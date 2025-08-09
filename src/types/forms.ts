@@ -1,4 +1,5 @@
 import { TextInputProps, ViewStyle } from "react-native";
+import { SelectOption } from "./variables";
 
 export type TrackColor = {
   true: string,
@@ -42,5 +43,16 @@ export interface DatePickerFieldProps {
   label?: string;
   containerStyle?: object;
   labelStyle?: object;
+  required?: boolean;
+}
+
+export interface SelectFieldProps {
+  name: string;
+  label?: string;
+  placeholder?: string;
+  options: SelectOption[];
+  containerStyle?: any;
+  labelStyle?: any;
+  pickerStyle?: any;
   required?: boolean;
 }
