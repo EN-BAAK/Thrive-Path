@@ -1,23 +1,27 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import AntDesign from "react-native-vector-icons/AntDesign"
 import { CardProps } from '../../types/cards';
 import { GoalWCategory } from '../../types/schemas';
 import { formatDate } from '../../misc/helpers';
 import colors from '../../styles/colors';
 import framework from '../../styles/framework';
-import { deleteGoal } from '../../api/crud/goals';
+import { deleteGoal, updateGoalStatusById, updateIsImportantById } from '../../api/crud/goals';
 import Variables from '../../styles/variables';
+import { Status } from '../../types/variables';
 
 const statusColors: Record<NonNullable<GoalWCategory['status']>, string> = {
   PENDING: colors.warning,
   COMPLETED: colors.success,
   CANCELED: colors.danger,
 };
+const statusList = [Status.PENDING, Status.COMPLETED, Status.CANCELED];
 
 const GoalCard: React.FC<CardProps<GoalWCategory>> = ({ record: goal, onEdit, onSuccess }) => {
   const [menuVisible, setMenuVisible] = useState(false);
+  const [statusMenuVisible, setStatusMenuVisible] = useState(false);
   const statusColor = goal.status ? statusColors[goal.status] : colors.secondary;
 
   const handleDelete = async () => {
@@ -30,6 +34,24 @@ const GoalCard: React.FC<CardProps<GoalWCategory>> = ({ record: goal, onEdit, on
       setMenuVisible(false);
     }
   };
+
+  const handleIsImportantToggle = async () => {
+    try {
+      await updateIsImportantById(goal.id, !goal.isImportant)
+      onSuccess?.()
+    } catch {
+      console.log('[Goal] Failed to update the goal important status');
+    }
+  }
+
+  const handleChangeStatus = async (status: Status) => {
+    try {
+      await updateGoalStatusById(goal.id, status)
+      onSuccess?.()
+    } catch {
+      console.log('[Goal] Failed to update the goal status');
+    }
+  }
 
   return (
     <View style={[styles.card, framework.card, framework.bgBackground, framework.p0]}>
@@ -44,14 +66,15 @@ const GoalCard: React.FC<CardProps<GoalWCategory>> = ({ record: goal, onEdit, on
             {goal.name}
           </Text>
 
-          {Boolean(goal.isImportant) && (
-            <FontAwesome5
-              name="star"
+          <TouchableOpacity onPress={handleIsImportantToggle}>
+            <AntDesign
+              name={goal.isImportant ? "star" : "staro"}
               size={16}
               color={colors.warning}
               style={[framework.ml2, framework.mt1]}
             />
-          )}
+          </TouchableOpacity>
+
         </View>
 
         {goal.categoryName && (
@@ -60,11 +83,42 @@ const GoalCard: React.FC<CardProps<GoalWCategory>> = ({ record: goal, onEdit, on
           </Text>
         )}
 
+
         {goal.status && (
-          <View style={[styles.statusBadge, framework.mt2, framework.px3, framework.roundedPill, { backgroundColor: statusColor }]}>
+          <TouchableOpacity
+            onPress={() => setStatusMenuVisible(true)}
+            style={[styles.statusBadge, framework.mt2, framework.px3, framework.roundedPill, { backgroundColor: statusColor }]}
+          >
             <Text style={[framework.textXs, framework.reversedText]}>{goal.status}</Text>
-          </View>
+          </TouchableOpacity>
         )}
+
+        <Modal
+          visible={statusMenuVisible}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setStatusMenuVisible(false)}
+        >
+          <TouchableOpacity
+            style={[framework.bgLayout, framework.flexOne, framework.flexCenter]}
+            activeOpacity={1}
+            onPressOut={() => setStatusMenuVisible(false)}
+          >
+            <View style={[styles.statusMenu, framework.bgBackground, framework.py2, framework.rounded, framework.shadowStrong]}>
+              {statusList.map((status) => (
+                <TouchableOpacity
+                  key={status}
+                  style={[framework.py3, framework.px5, status === goal.status && framework.bgLightMain]}
+                  onPress={() => handleChangeStatus(status)}
+                >
+                  <Text style={status === goal.status && framework.textMain}>
+                    {status}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </TouchableOpacity>
+        </Modal>
       </LinearGradient>
 
       <View style={[framework.p3, framework.pt2]}>
@@ -139,4 +193,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: colors.lightGray,
   },
+  statusMenu: {
+    width: 200,
+  }
 });

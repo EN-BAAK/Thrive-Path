@@ -38,10 +38,12 @@ const AddEditCategoryModal: React.FC<AddEditCategoryModalProps> = ({
 
   return (
     <Modal animationType="slide" transparent visible={visible}>
-      <TouchableWithoutFeedback
+      <TouchableOpacity
+        activeOpacity={1}
+        style={[framework.bgLayout, framework.flexOne, framework.justifyCenter, framework.px3]}
         onPress={onClose}
       >
-        <View style={[framework.bgLayout, framework.flexOne, framework.justifyCenter, framework.px3]}>
+        <TouchableWithoutFeedback>
           <View style={[framework.bgBackground, framework.p4, framework.roundedMd, framework.shadowMedium]}>
             <Text style={[framework.bgMain, framework.mb4, framework.py2, framework.px4, framework.roundedBottomMd, framework.textCenter, framework.fontBold, framework.textXl, framework.reversedText]}>
               {initialCategory?.id === -1 ? 'Add New Category' : 'Edit Category'}
@@ -72,7 +74,7 @@ const AddEditCategoryModal: React.FC<AddEditCategoryModalProps> = ({
 
                   <IconPickerField
                     name='icon'
-                    label='icon'
+                    label='Icon'
                     required
                     containerStyle={framework.mb4}
                   />
@@ -89,8 +91,8 @@ const AddEditCategoryModal: React.FC<AddEditCategoryModalProps> = ({
               )}
             </Formik>
           </View>
-        </View>
-      </TouchableWithoutFeedback>
+        </TouchableWithoutFeedback>
+      </TouchableOpacity>
     </Modal>
   );
 };

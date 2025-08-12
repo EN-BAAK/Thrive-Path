@@ -7,7 +7,7 @@ class ThemeVariables {
     this.colors = {
       mainColor: "#65046aff",
       lightMain: "#e600ff4d",
-      secondColor: "#57380eff",
+      secondColor: "#bebebeff",
       backgroundColor: "#fcfcfcff",
       textColor: "#000",
       reversedTextColor: "#fff"

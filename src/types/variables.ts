@@ -2,7 +2,12 @@ import { TextStyle, ViewStyle } from "react-native";
 
 type Operation = '=' | '!=' | '<' | '<=' | '>' | '>=' | 'LIKE';
 type JoinTypes = 'INNER' | 'LEFT' | 'RIGHT' | 'FULL';
-export type Status = "PENDING" | "COMPLETED" | "CANCELED"
+export enum Status {
+  PENDING = "PENDING",
+  COMPLETED = "COMPLETED",
+  CANCELED = "CANCELED"
+}
+
 
 export interface Condition {
   table?: string;

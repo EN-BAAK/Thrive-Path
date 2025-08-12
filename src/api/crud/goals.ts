@@ -2,7 +2,8 @@ import { getDatabase } from '../db';
 import { Goal, GoalWCategory, SafetyGoal } from '../../types/schemas';
 import initializeTableFunctions from '../../misc/database';
 import { initializeDatabase } from '../schema';
-import { Condition } from '../../types/variables';
+import { Condition, Status } from '../../types/variables';
+import { booleanToNumber } from '../../misc/helpers';
 
 initializeDatabase();
 
@@ -122,3 +123,24 @@ export const findGoal = async (conditions: Condition[]): Promise<Goal | null> =>
     throw error;
   }
 };
+
+export const updateIsImportantById = async (id: number, isImportant: boolean) => {
+  try {
+    const goalsDB = await initializeTableFunctions(getDatabase, TABLE_NAME);
+    return await goalsDB.update(id, { isImportant: booleanToNumber(isImportant) });
+  } catch (error) {
+    console.error('[UPDATE_ISIMPORTANT] Error:', error);
+    throw error;
+  }
+};
+
+export const updateGoalStatusById = async (id: number, status: Status) => {
+  try {
+    const goalsDB = await initializeTableFunctions(getDatabase, TABLE_NAME);
+    return await goalsDB.update(id, { status });
+  } catch (error) {
+    console.error('[UPDATE_STATUS] Error:', error);
+    throw error;
+  }
+};
+
