@@ -29,3 +29,11 @@ export type SelectOption = {
   label: string;
   value: any;
 };
+
+export type ThemeColors = {
+  mainColor: string;
+  secondColor: string;
+  backgroundColor: string;
+  textColor: string;
+  reversedTextColor: string
+};

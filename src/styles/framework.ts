@@ -1,6 +1,12 @@
 import { StyleSheet } from 'react-native';
 import colors from './colors';
 import { NamedStyles } from '../types/variables';
+import Variables from './variables';
+
+const sizes: NamedStyles<any> = {
+  h100: { height: "100%" },
+  w100: { width: "100%" }
+}
 
 const backgrounds: NamedStyles<any> = {
   bgPrimary: { backgroundColor: colors.primary },
@@ -8,6 +14,7 @@ const backgrounds: NamedStyles<any> = {
   bgDanger: { backgroundColor: colors.danger },
   bgSuccess: { backgroundColor: colors.success },
   bgWarning: { backgroundColor: colors.warning },
+  bgInfo: { backgroundColor: colors.info },
   bgLight: { backgroundColor: colors.light },
   bgDark: { backgroundColor: colors.dark },
   bgLayout: { backgroundColor: colors.layout }
@@ -153,6 +160,9 @@ const layout: NamedStyles<any> = {
   },
   flexRow: {
     flexDirection: "row"
+  },
+  flexColumn: {
+    flexDirection: "column"
   },
   alignCenter: {
     alignItems: "center"
@@ -457,7 +467,16 @@ const components: NamedStyles<any> = {
   }
 }
 
+const mainTheme: NamedStyles<any> = {
+  bgMain: { backgroundColor: Variables.mainColor },
+  bgBackground: { backgroundColor: Variables.backgroundColor },
+  textMain: { color: Variables.mainColor },
+  text: { color: Variables.textColor },
+  reversedText: { color: Variables.reversedTextColor }
+}
+
 const framework = StyleSheet.create({
+  ...sizes,
   ...spacing,
   ...textSizes,
   ...backgrounds,
@@ -469,7 +488,8 @@ const framework = StyleSheet.create({
   ...textWeights,
   ...shadows,
   ...components,
-  ...positions
+  ...positions,
+  ...mainTheme
 });
 
 export default framework;

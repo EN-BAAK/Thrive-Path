@@ -7,6 +7,8 @@ import framework from '../../styles/framework';
 import InputField from '../forms/InputField';
 import { addEditCategoryValidation } from '../../constants/formValidation';
 import { AddEditCategoryModalProps } from '../../types/modals';
+import ColorPickerField from '../forms/ColorPickerField';
+import IconPickerField from '../forms/IconPickerField';
 
 const AddEditCategoryModal: React.FC<AddEditCategoryModalProps> = ({
   visible,
@@ -23,9 +25,9 @@ const AddEditCategoryModal: React.FC<AddEditCategoryModalProps> = ({
       }
 
       if (payload.id === -1) {
-        await createCategory(values);
+        await createCategory(payload);
       } else {
-        await updateCategory(payload.id, values);
+        await updateCategory(payload.id, payload);
       }
       onSave();
       onClose();
@@ -68,11 +70,17 @@ const AddEditCategoryModal: React.FC<AddEditCategoryModalProps> = ({
                   containerStyle={framework.mb2}
                 />
 
-                <InputField
-                  name="color"
-                  label="Color (Hex)"
+                <ColorPickerField
+                  name='color'
+                  label='Color'
                   required
-                  placeholder="#ffffff"
+                  containerStyle={framework.mb4}
+                />
+
+                <IconPickerField
+                  name='icon'
+                  label='icon'
+                  required
                   containerStyle={framework.mb4}
                 />
 

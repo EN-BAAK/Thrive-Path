@@ -1,126 +1,142 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import framework from '../../styles/framework';
+import { CardProps } from '../../types/cards';
+import { GoalWCategory } from '../../types/schemas';
 import { formatDate } from '../../misc/helpers';
 import colors from '../../styles/colors';
-import { CardProps } from '../../types/cards';
-import { Goal } from '../../types/schemas';
-import { deleteGoal, updateGoal } from '../../api/crud/goals';
+import framework from '../../styles/framework';
+import { deleteGoal } from '../../api/crud/goals';
+import Variables from '../../styles/variables';
 
-const GoalCard: React.FC<CardProps<Goal>> = ({ record: goal, onEdit, onSuccess }) => {
+const statusColors: Record<NonNullable<GoalWCategory['status']>, string> = {
+  PENDING: colors.warning,
+  COMPLETED: colors.success,
+  CANCELED: colors.danger,
+};
+
+const GoalCard: React.FC<CardProps<GoalWCategory>> = ({ record: goal, onEdit, onSuccess }) => {
   const [menuVisible, setMenuVisible] = useState(false);
-
-  const changeCheck = async () => {
-    const isChecked = !goal.flag
-    try {
-      await updateGoal(goal.id, { flag: isChecked })
-      onSuccess?.()
-    } catch {
-      console.log("[Goal] Failed to update flag")
-    } finally {
-      setMenuVisible(false);
-    }
-  };
-
-  const handleEdit = () => {
-    setMenuVisible(false);
-    onEdit?.()
-  };
+  const statusColor = goal.status ? statusColors[goal.status] : colors.secondary;
 
   const handleDelete = async () => {
     try {
-      await deleteGoal(goal.id)
-      onSuccess?.()
+      await deleteGoal(goal.id);
+      onSuccess?.();
     } catch {
-      console.log("[Goal] Failed to delete the goal")
+      console.log('[Goal] Failed to delete the goal');
     } finally {
       setMenuVisible(false);
     }
   };
 
   return (
-    <View style={[framework.card, framework.relative]}>
-      <View style={[framework.flexRow, framework.gap2, framework.absolute, framework.top2, framework.right2]}>
-        <TouchableOpacity
-          style={[framework.py2, framework.px2]}
-          onPress={changeCheck}
-          hitSlop={{ top: 20, right: 20, bottom: 20, left: 20 }}
-        >
-          <FontAwesome5
-            name={goal.flag ? 'check-circle' : 'circle'}
-            size={20}
-            color={goal.flag ? colors.success : colors.secondary}
-            aria-hidden={true}
-          />
-        </TouchableOpacity>
+    <View style={[styles.card, framework.card, framework.bgBackground, framework.p0]}>
+      <View style={[styles.categoryBar, framework.h100, framework.absolute, framework.top0, framework.left0, { backgroundColor: goal.categoryColor || colors.primary }]} />
 
-        <TouchableOpacity
-          style={[framework.py2, framework.px2]}
-          onPress={() => setMenuVisible(prev => !prev)} >
-          <FontAwesome5 name="ellipsis-v" size={18} color={colors.secondary} />
-        </TouchableOpacity>
-      </View>
-
-      <TouchableOpacity style={[
-        menuVisible ? framework.dFlex : framework.dNone,
-        framework.bgLight,
-        framework.mt3,
-        framework.rounded,
-        framework.shadowLight,
-        framework.absolute,
-        framework.top5,
-        framework.right3,
-        framework.indexTop
-      ]}
-        onPress={() => setMenuVisible(false)}
+      <LinearGradient
+        colors={[goal.categoryColor || Variables.mainColor, `${goal.categoryColor || Variables.mainColor}99`]}
+        style={[framework.p4, framework.pb2]}
       >
-        <TouchableOpacity onPress={handleEdit} style={[framework.py1, framework.px4, framework.borderBottom1, framework.borderGray]}>
-          <Text style={framework.textCenter}>Edit</Text>
-        </TouchableOpacity>
+        <View style={[framework.flexRow, framework.justifyBetween]}>
+          <Text style={[framework.fontBold, framework.textLg, framework.reversedText]}>
+            {goal.name}
+          </Text>
 
-        <TouchableOpacity onPress={handleDelete} style={[framework.py1, framework.px4]}>
-          <Text style={framework.textCenter}>Delete</Text>
-        </TouchableOpacity>
-      </TouchableOpacity>
-
-      <Text style={[framework.fontBold, framework.textLg, framework.textPrimary]}>
-        {goal.name}
-      </Text>
-
-      {goal.description && (
-        <Text style={[framework.mt1, framework.mb3, framework.textMuted]}>
-          {goal.description}
-        </Text>
-      )}
-
-      <View style={[framework.mt2, framework.mb5, framework.py2, framework.flexRow, framework.alignCenter, framework.justifyBetween]}>
-        <View style={[framework.alignCenter, framework.flexOne, framework.borderRight]}>
-          <FontAwesome5
-            name="star"
-            size={25}
-            color={colors.warning}
-            style={framework.mb2}
-          />
-          <Text style={[framework.fontSemiBold, framework.textXs]}>{goal.points}</Text>
+          {goal.isImportant && (
+            <FontAwesome5
+              name="star"
+              size={16}
+              color={colors.warning}
+              style={[framework.ml2, framework.mt1]}
+            />
+          )}
         </View>
 
-        <View style={[framework.alignCenter, framework.flexOne, framework.borderLeft]}>
-          <FontAwesome5
-            name="clock"
-            size={25}
-            color={colors.info}
-            style={framework.mb2}
-          />
-          <Text style={[framework.fontSemiBold, framework.textXs]}>{formatDate(goal.deadline)}</Text>
+        {goal.categoryName && (
+          <Text style={[framework.mt1, framework.textSm, framework.reversedText]}>
+            {goal.categoryName}
+          </Text>
+        )}
+
+        {goal.status && (
+          <View style={[styles.statusBadge, framework.mt2, framework.px3, framework.roundedPill, { backgroundColor: statusColor }]}>
+            <Text style={[framework.textXs, framework.reversedText]}>{goal.status}</Text>
+          </View>
+        )}
+      </LinearGradient>
+
+      <View style={[framework.p3, framework.pt2]}>
+        {goal.description && (
+          <Text style={[framework.mb3, framework.textMuted]}>{goal.description}</Text>
+        )}
+
+        <View style={[framework.flexRow, framework.justifyBetween]}>
+          <View style={[framework.bgWarning, framework.py1, framework.px3, framework.flexRow, framework.alignCenter, framework.gap2, framework.roundedPill]}>
+            <FontAwesome5 name="star" size={14} color={colors.white} />
+
+            <Text style={[framework.fontBold, framework.textSm, framework.reversedText]}>
+              {goal.points} pts
+            </Text>
+          </View>
+
+          <View style={[framework.bgInfo, framework.py1, framework.px3, framework.flexRow, framework.alignCenter, framework.gap2, framework.roundedPill]}>
+            <FontAwesome5 name="clock" size={14} color={colors.white} />
+            <Text style={[framework.textSm, framework.fontBold, framework.reversedText]}>
+              {formatDate(goal.deadline)}
+            </Text>
+          </View>
         </View>
       </View>
 
-      <View>
-        <Text style={[framework.textXs, framework.textMuted, framework.absolute, framework.right0, framework.bottom0]}>{formatDate(goal.updatedAt)}</Text>
+      <View style={[styles.footer, framework.py2, framework.px4, framework.flexRow, framework.justifyBetween, framework.alignCenter, framework.relative]}>
+        <Text style={[framework.textXs, framework.textMuted]}>
+          Updated {formatDate(goal.updatedAt)}
+        </Text>
+
+        <TouchableOpacity onPress={() => setMenuVisible(prev => !prev)}>
+          <FontAwesome5 name="ellipsis-v" size={16} color={colors.muted} />
+        </TouchableOpacity>
+
+        {menuVisible && (
+          <View style={[styles.menu, framework.bgLight, framework.rounded, framework.shadowLight, framework.absolute, framework.right4, framework.overflowHidden]}>
+            <TouchableOpacity onPress={onEdit} style={[styles.menuItem, framework.py2, framework.px4]}>
+              <Text>Edit</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleDelete} style={[styles.menuItem, framework.py2, framework.px4]}>
+              <Text>Delete</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     </View>
   );
 };
 
 export default GoalCard;
+
+const styles = StyleSheet.create({
+  card: {
+    overflow: 'hidden',
+  },
+  categoryBar: {
+    width: 5,
+    zIndex: 2,
+  },
+  statusBadge: {
+    alignSelf: 'flex-start',
+    paddingVertical: 3,
+  },
+  footer: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.lightGray,
+  },
+  menu: {
+    top: -80,
+  },
+  menuItem: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.lightGray,
+  },
+});

@@ -24,7 +24,8 @@ export type GoalWCategory = Goal & {
 export type Category = {
   id: number,
   name: string,
-  color?: string
+  color?: string,
+  icon: string,
 }
 
 export type SafeCategory = Omit<Category, 'id'>;

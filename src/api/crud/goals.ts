@@ -37,17 +37,17 @@ export const findAllGoals = async (): Promise<GoalWCategory[]> => {
         }
       ],
       [
-        { column: 'id' },
-        { column: 'name' },
-        { column: 'description' },
-        { column: 'isImportant' },
-        { column: 'points' },
-        { column: 'deadline' },
-        { column: 'status' },
-        { column: 'priority' },
-        { column: 'categoryId' },
-        { column: 'createdAt' },
-        { column: 'updatedAt' }
+        { column: 'id', alias: "id" },
+        { column: 'name', alias: "name" },
+        { column: 'description', alias: "description" },
+        { column: 'isImportant', alias: "isImportant" },
+        { column: 'points', alias: "points" },
+        { column: 'deadline', alias: "deadline" },
+        { column: 'status', alias: "status" },
+        { column: 'priority', alias: "priority" },
+        { column: 'categoryId', alias: "categoryId" },
+        { column: 'createdAt', alias: "createdAt" },
+        { column: 'updatedAt', alias: "updatedAt" }
       ]
     );
   } catch (error) {
@@ -88,7 +88,8 @@ export const findGoalById = async (id: number): Promise<GoalWCategory | null> =>
           type: 'LEFT',
           columns: [
             { column: 'name', alias: 'categoryName' },
-            { column: 'color', alias: 'categoryColor' }
+            { column: 'color', alias: 'categoryColor' },
+            { column: 'icon', alias: 'categoryIcon' }
           ]
         }
       ],

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, View, TouchableOpacity, Text } from 'react-native';
-import { Goal } from '../types/schemas';
+import { Goal, GoalWCategory } from '../types/schemas';
 import { findAllGoals } from '../api/crud/goals';
 import GoalCard from '../components/cards/Goal';
 import Loading from './Loading';
@@ -8,9 +8,10 @@ import EmptyContent from '../components/EmptyContent';
 import AddEditGoalModal from '../components/modals/AddEditGoal';
 import framework from '../styles/framework';
 import { defaultGoal } from '../constants/formValues';
+import { omit } from '../misc/helpers';
 
 const Goals: React.FC = (): React.JSX.Element => {
-  const [goals, setGoals] = useState<Goal[]>([]);
+  const [goals, setGoals] = useState<GoalWCategory[]>([]);
   const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -25,6 +26,10 @@ const Goals: React.FC = (): React.JSX.Element => {
       setIsLoading(false);
     }
   };
+
+const onEdit = (goal: GoalWCategory) => {
+  setSelectedGoal(omit(goal, ['categoryName', 'categoryColor']));
+};
 
   useEffect(() => {
     fetchGoals();
@@ -62,7 +67,7 @@ const Goals: React.FC = (): React.JSX.Element => {
           <GoalCard
             key={goal.id}
             record={goal}
-            onEdit={() => setSelectedGoal(goal)}
+            onEdit={() => onEdit(goal)}
             onSuccess={fetchGoals}
           />
         ))}

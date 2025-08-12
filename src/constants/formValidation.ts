@@ -1,4 +1,5 @@
 import * as Yup from 'yup';
+import { iconList } from '../misc/global';
 
 export const addEditGoalValidation = Yup.object().shape({
   name: Yup.string()
@@ -37,4 +38,7 @@ export const addEditCategoryValidation = Yup.object().shape({
   color: Yup.string()
     .matches(/^#(?:[0-9a-fA-F]{3}){1,2}$/, 'Invalid color hex')
     .required('Color is required'),
+  icon: Yup.string()
+    .oneOf(iconList, "Invalid icon")
+    .required('Icon is required'),
 });

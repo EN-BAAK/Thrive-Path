@@ -15,44 +15,35 @@ export type TextErrorProps = {
   msg: string
 }
 
-export interface InputFieldProps {
-  name: string;
-  label?: string;
-  placeholder?: string;
-  type?: TextInputProps['keyboardType'];
-  secureTextEntry?: boolean;
-  containerStyle?: ViewStyle;
-  inputStyle?: TextInputProps['style'];
-  labelStyle?: ViewStyle;
-  autoComplete?: TextInputProps['autoComplete'];
-  multiLine?: boolean,
+type FieldProps = {
+  name: string,
+  label: string,
+  placeholder?: string,
+  containerStyle?: ViewStyle,
+  labelStyle?: ViewStyle,
   required?: boolean
 }
 
-export interface SwitchFieldProps {
-  name: string;
-  label?: string;
-  containerStyle?: object;
-  labelStyle?: object;
+export interface InputFieldProps extends FieldProps {
+  type?: TextInputProps['keyboardType'];
+  secureTextEntry?: boolean;
+  inputStyle?: TextInputProps['style'];
+  autoComplete?: TextInputProps['autoComplete'];
+  multiLine?: boolean,
+}
+
+export interface SwitchFieldProps extends FieldProps {
   trackColor: TrackColor,
   thumbColor: ThumbColor
 }
 
-export interface DatePickerFieldProps {
-  name: string;
-  label?: string;
-  containerStyle?: object;
-  labelStyle?: object;
-  required?: boolean;
+export interface DatePickerFieldProps extends FieldProps { }
+
+export interface SelectFieldProps extends FieldProps {
+  options: SelectOption[];
+  pickerStyle?: any;
 }
 
-export interface SelectFieldProps {
-  name: string;
-  label?: string;
-  placeholder?: string;
-  options: SelectOption[];
-  containerStyle?: any;
-  labelStyle?: any;
-  pickerStyle?: any;
-  required?: boolean;
-}
+export interface ColorPickerFieldProps extends FieldProps { }
+
+export interface IconPickerFieldProps extends FieldProps {}

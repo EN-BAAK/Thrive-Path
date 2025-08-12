@@ -32,7 +32,7 @@ export const getCategories = async (): Promise<Category[]> => {
 export const updateCategory = async (id: number, updates: Partial<Category>): Promise<void> => {
   try {
     const categoriesDB = await initializeTableFunctions(getDatabase, TABLE_NAME);
-    await categoriesDB.update(id, updates);
+    await categoriesDB.update(id, updates, isTimestamp);
   } catch (error) {
     console.error('[UPDATE_CATEGORY] Error:', error);
     throw error;

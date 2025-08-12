@@ -3,16 +3,12 @@ import { getDatabase } from './db';
 export const initializeDatabase = async () => {
   const db = await getDatabase();
 
-  await db.executeSql(`PRAGMA foreign_keys = OFF`);
-  await db.executeSql(`DROP TABLE IF EXISTS goals`);
-  await db.executeSql(`DROP TABLE IF EXISTS categories`);
-  await db.executeSql(`PRAGMA foreign_keys = ON`);
-
   await db.executeSql(`
     CREATE TABLE IF NOT EXISTS categories (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL UNIQUE,
-      color TEXT
+      color TEXT,
+      icon TEXT
     );
   `);
 

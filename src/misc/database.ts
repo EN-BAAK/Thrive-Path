@@ -121,17 +121,40 @@ class DatabaseFunctions {
     joins?: JoinInput[],
     columns?: ColumnSelection[]
   ): Promise<T | null> {
-    const result = await this.findAll<T>(conditions, undefined, joins, columns);
-    return result[0] ?? null;
+    try {
+      const selectClause = this.buildSelectClause(columns, joins);
+      const joinClause = this.buildJoinClause(joins);
+
+      let query = `SELECT ${selectClause} FROM ${this.table}${joinClause}`;
+      const values: any[] = [];
+
+      if (conditions.length) {
+        const whereClause = conditions.map(
+          cond => `${cond.table ?? this.table}.${cond.field} ${cond.operator ?? '='} ?`
+        ).join(' AND ');
+        query += ` WHERE ${whereClause}`;
+        values.push(...conditions.map(cond => cond.value));
+      }
+
+      query += ' LIMIT 1';
+
+      const [results] = await this.db.executeSql(query, values);
+      if (results.rows.length === 0) return null;
+
+      return results.rows.item(0) as T;
+    } catch (error) {
+      console.error(`[FIND_ONE][${this.table}] Error:`, error);
+      throw error;
+    }
   }
 
   async findByPk<T>(id: number): Promise<T | null> {
     return this.findOne<T>([{ field: 'id', value: id }]);
   }
 
-  async update(id: number, updates: Partial<any>) {
+
+  async update(id: number, updates: Partial<any>, isTimestamp = true) {
     try {
-      const updatedAt = new Date().toISOString();
       const fields: string[] = [];
       const values: any[] = [];
 
@@ -140,10 +163,12 @@ class DatabaseFunctions {
         values.push((updates as any)[key]);
       }
 
-      fields.push('updatedAt = ?');
-      values.push(updatedAt);
+      if (isTimestamp) {
+        const updatedAt = new Date().toISOString();
+        fields.push('updatedAt = ?');
+        values.push(updatedAt);
+      }
       values.push(id);
-
       const query = `UPDATE ${this.table} SET ${fields.join(', ')} WHERE id = ?`;
       await this.db.executeSql(query, values);
     } catch (error) {

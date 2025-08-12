@@ -18,4 +18,5 @@ export const defaultCategory: Category = {
   id: -1,
   name: '',
   color: '#cccccc',
+  icon: "shield-outline"
 };

@@ -52,8 +52,10 @@ const AddEditGoalModal: React.FC<AddEditGoalModalProps> = ({
       };
 
       if (payload.id === -1) {
+        console.log(payload)
         await createGoal(payload);
       } else {
+        console.log(payload, "update")
         await updateGoal(payload.id, payload);
       }
 
