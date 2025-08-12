@@ -32,6 +32,7 @@ export type SelectOption = {
 
 export type ThemeColors = {
   mainColor: string;
+  lightMain: string,
   secondColor: string;
   backgroundColor: string;
   textColor: string;

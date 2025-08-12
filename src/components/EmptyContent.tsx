@@ -11,14 +11,7 @@ const EmptyContent: React.FC<EmptyContentProps> = ({
 }) => {
   return (
     <View style={[framework.flexOne, framework.py5, framework.flexCenter]}>
-      <Text
-        style={[
-          framework.textCapitalize,
-          framework.textCenter,
-          framework.fontSemiBold,
-          framework.textLg,
-          framework.textPrimary,
-        ]}
+      <Text style={[framework.textCapitalize, framework.textCenter, framework.fontSemiBold, framework.textLg, framework.textMain,]}
       >
         {message}
       </Text>
@@ -29,22 +22,19 @@ const EmptyContent: React.FC<EmptyContentProps> = ({
         resizeMode="contain"
       />
 
-      {buttonText && onButtonPress && (
-        <TouchableOpacity
-          onPress={onButtonPress}
-          style={[
-            framework.bgPrimary,
-            framework.px4,
-            framework.py2,
-            framework.rounded,
-          ]}
-        >
-          <Text style={[framework.textWhite, framework.textBase, framework.textCapitalize]}>
-            {buttonText}
-          </Text>
-        </TouchableOpacity>
-      )}
-    </View>
+      {
+        buttonText && onButtonPress && (
+          <TouchableOpacity
+            onPress={onButtonPress}
+            style={[framework.bgMain, framework.px4, framework.py2, framework.rounded,]}
+          >
+            <Text style={[framework.textWhite, framework.textBase, framework.textCapitalize]}>
+              {buttonText}
+            </Text>
+          </TouchableOpacity>
+        )
+      }
+    </View >
   );
 };
 

@@ -3,10 +3,18 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-nati
 import { Field } from 'formik';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import framework from '../../styles/framework';
-import colors from '../../styles/colors';
 import TextError from './TextError';
 import { IconPickerFieldProps } from '../../types/forms';
 import { iconList } from '../../misc/global';
+import Variables from '../../styles/variables';
+
+function chunkArray<T>(array: T[], chunkSize: number): T[][] {
+  const result: T[][] = [];
+  for (let i = 0; i < array.length; i += chunkSize) {
+    result.push(array.slice(i, i + chunkSize));
+  }
+  return result;
+}
 
 const IconPickerField: React.FC<IconPickerFieldProps> = ({
   name,
@@ -22,13 +30,7 @@ const IconPickerField: React.FC<IconPickerFieldProps> = ({
         <View style={containerStyle}>
           {label && (
             <Text
-              style={[
-                framework.mb1,
-                framework.fontSemiBold,
-                framework.textSm,
-                framework.dark,
-                labelStyle
-              ]}
+              style={[framework.mb1, framework.fontSemiBold, framework.textSm, labelStyle]}
             >
               {label}
               {required && ' *'}
@@ -50,17 +52,8 @@ const IconPickerField: React.FC<IconPickerFieldProps> = ({
                   return (
                     <TouchableOpacity
                       key={iconName}
-                      style={[
-                        styles.iconWrapper,
-                        framework.bgBackground,
-                        framework.flexCenter,
-                        framework.rounded,
-                        framework.border1,
-                        framework.borderSecondary,
-                        isSelected && {
-                          backgroundColor: colors.lightPrimary,
-                          borderColor: colors.primary
-                        },
+                      style={[styles.iconWrapper, framework.bgSecond, framework.flexCenter, framework.rounded, framework.border1, framework.borderSecondary,
+                      isSelected && [framework.bgLightMain]
                       ]}
                       onPress={() => {
                         form.setFieldValue(name, iconName);
@@ -69,7 +62,7 @@ const IconPickerField: React.FC<IconPickerFieldProps> = ({
                       <MaterialCommunityIcons
                         name={iconName}
                         size={22}
-                        color={isSelected ? colors.primary : colors.dark}
+                        color={isSelected ? Variables.mainColor : Variables.reversedTextColor}
                       />
                     </TouchableOpacity>
                   );
@@ -84,14 +77,6 @@ const IconPickerField: React.FC<IconPickerFieldProps> = ({
     </Field>
   );
 };
-
-function chunkArray<T>(array: T[], chunkSize: number): T[][] {
-  const result: T[][] = [];
-  for (let i = 0; i < array.length; i += chunkSize) {
-    result.push(array.slice(i, i + chunkSize));
-  }
-  return result;
-}
 
 export default IconPickerField;
 

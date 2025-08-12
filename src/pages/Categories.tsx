@@ -7,7 +7,7 @@ import EmptyContent from '../components/EmptyContent';
 import framework from '../styles/framework';
 import AddEditCategoryModal from '../components/modals/AddEditCategory';
 import { defaultCategory } from '../constants/formValues';
-import Category from '../components/cards/Category';
+import CategoryCard from '../components/cards/Category';
 
 const Categories: React.FC = (): React.JSX.Element => {
   const [categories, setCategories] = useState<CategoryType[]>([]);
@@ -53,13 +53,13 @@ const Categories: React.FC = (): React.JSX.Element => {
   }
 
   return (
-    <View style={[framework.flexOne]}>
+    <View style={[framework.bgBackground, framework.flexOne]}>
       <ScrollView
         style={[framework.px2]}
         contentContainerStyle={[framework.py2]}
       >
         {categories.map((cat) => (
-          <Category
+          <CategoryCard
             key={cat.id}
             record={cat}
             onEdit={() => setSelectedCategory(cat)}
@@ -69,18 +69,10 @@ const Categories: React.FC = (): React.JSX.Element => {
       </ScrollView>
 
       <TouchableOpacity
-        style={[
-          framework.bgPrimary,
-          framework.px4,
-          framework.py2,
-          framework.rounded,
-          framework.absolute,
-          framework.bottom1,
-          framework.right1,
-        ]}
+        style={[framework.bgMain, framework.px4, framework.py2, framework.rounded, framework.absolute, framework.bottom1, framework.right1,]}
         onPress={() => setSelectedCategory(defaultCategory)}
       >
-        <Text style={[framework.textWhite, framework.fontBold]}>
+        <Text style={[framework.reversedText, framework.fontBold]}>
           + Add Category
         </Text>
       </TouchableOpacity>

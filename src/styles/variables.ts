@@ -5,11 +5,12 @@ class ThemeVariables {
 
   constructor() {
     this.colors = {
-      mainColor: "#ffff00ff",
-      secondColor: "#6C757D",
-      backgroundColor: "#FFFFFF",
-      textColor: "#1E1E1E",
-      reversedTextColor: "#FFFFFF"
+      mainColor: "#65046aff",
+      lightMain: "#e600ff4d",
+      secondColor: "#57380eff",
+      backgroundColor: "#fcfcfcff",
+      textColor: "#000",
+      reversedTextColor: "#fff"
     };
   }
 
@@ -25,9 +26,11 @@ class ThemeVariables {
   get textColor() {
     return this.colors.textColor;
   }
-
   get reversedTextColor() {
     return this.colors.reversedTextColor;
+  }
+  get lightMain() {
+    return this.colors.lightMain;
   }
 
   set mainColor(value: string) {
@@ -42,9 +45,11 @@ class ThemeVariables {
   set textColor(value: string) {
     this.colors.textColor = value;
   }
-
   set reversedTextColor(value: string) {
     this.colors.reversedTextColor = value;
+  }
+  set lightMain(value: string) {
+    this.colors.lightMain = value;
   }
 
   updateColors(newColors: Partial<ThemeColors>) {

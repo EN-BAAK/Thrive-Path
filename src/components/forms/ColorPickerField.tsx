@@ -20,13 +20,7 @@ const ColorPickerField: React.FC<ColorPickerFieldProps> = ({
       {({ field, form, meta }: any) => (
         <View style={containerStyle}>
           {label && (
-            <Text style={[
-              framework.mb1,
-              framework.fontSemiBold,
-              framework.textSm,
-              framework.dark,
-              labelStyle
-            ]}>
+            <Text style={[framework.mb1, framework.fontSemiBold, framework.textSm, labelStyle]}>
               {label}
               {required && ' *'}
             </Text>
@@ -34,14 +28,7 @@ const ColorPickerField: React.FC<ColorPickerFieldProps> = ({
 
           <TouchableOpacity
             onPress={() => setShowPicker(true)}
-            style={[
-              framework.px3,
-              framework.py2,
-              framework.border1,
-              framework.borderLight,
-              framework.rounded,
-              { backgroundColor: field.value || '#ffffff' }
-            ]}
+            style={[framework.px3, framework.py2, framework.border1, framework.borderLight, framework.rounded, { backgroundColor: field.value || '#ffffff' }]}
           >
             <Text style={framework.textCenter}>
               {field.value || 'Select Color'}
@@ -55,9 +42,9 @@ const ColorPickerField: React.FC<ColorPickerFieldProps> = ({
             onRequestClose={() => setShowPicker(false)}
           >
             <TouchableWithoutFeedback onPress={() => setShowPicker(false)}>
-              <View style={[styles.modalOverlay, framework.flexOne, framework.justifyCenter]}>
+              <View style={[framework.flexOne, framework.justifyCenter]}>
                 <TouchableWithoutFeedback>
-                  <View style={[styles.modalContent, framework.bgLight, framework.mx4, framework.p4, framework.roundedMd]}>
+                  <View style={[styles.modalContent, framework.bgBackground, framework.mx4, framework.p4, framework.roundedMd]}>
                     <WheelColorPicker
                       color={field.value || '#ffffff'}
                       onColorChange={(color) => {
@@ -72,10 +59,10 @@ const ColorPickerField: React.FC<ColorPickerFieldProps> = ({
                       row={false}
                     />
                     <TouchableOpacity
-                      style={[framework.mt3, framework.p2, framework.bgPrimary, framework.rounded]}
+                      style={[framework.mt3, framework.p2, framework.bgMain, framework.rounded]}
                       onPress={() => setShowPicker(false)}
                     >
-                      <Text style={framework.textCenter}>Close</Text>
+                      <Text style={[framework.textCenter, framework.reversedText]}>Close</Text>
                     </TouchableOpacity>
                   </View>
                 </TouchableWithoutFeedback>
@@ -93,9 +80,6 @@ const ColorPickerField: React.FC<ColorPickerFieldProps> = ({
 export default ColorPickerField;
 
 const styles = StyleSheet.create({
-  modalOverlay: {
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
   modalContent: {
     height: 500,
   }

@@ -27,9 +27,9 @@ const Goals: React.FC = (): React.JSX.Element => {
     }
   };
 
-const onEdit = (goal: GoalWCategory) => {
-  setSelectedGoal(omit(goal, ['categoryName', 'categoryColor']));
-};
+  const onEdit = (goal: GoalWCategory) => {
+    setSelectedGoal(omit(goal, ['categoryName', 'categoryColor']));
+  };
 
   useEffect(() => {
     fetchGoals();
@@ -58,7 +58,7 @@ const onEdit = (goal: GoalWCategory) => {
   }
 
   return (
-    <View style={[framework.flexOne]}>
+    <View style={[framework.bgBackground, framework.flexOne]}>
       <ScrollView
         style={[framework.px2]}
         contentContainerStyle={[framework.py2]}
@@ -74,18 +74,10 @@ const onEdit = (goal: GoalWCategory) => {
       </ScrollView>
 
       <TouchableOpacity
-        style={[
-          framework.bgPrimary,
-          framework.px4,
-          framework.py2,
-          framework.rounded,
-          framework.absolute,
-          framework.bottom1,
-          framework.right1,
-        ]}
+        style={[framework.bgMain, framework.px4, framework.py2, framework.rounded, framework.absolute, framework.bottom1, framework.right1,]}
         onPress={() => setSelectedGoal(defaultGoal)}
       >
-        <Text style={[framework.textWhite, framework.fontBold]}>
+        <Text style={[framework.reversedText, framework.fontBold]}>
           + Add Goal
         </Text>
       </TouchableOpacity>

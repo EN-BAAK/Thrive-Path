@@ -155,6 +155,9 @@ const layout: NamedStyles<any> = {
   justifyBetween: {
     justifyContent: "space-between"
   },
+  justifyEnd: {
+    justifyContent: "flex-end"
+  },
   overflowHidden: {
     overflow: "hidden"
   },
@@ -469,6 +472,8 @@ const components: NamedStyles<any> = {
 
 const mainTheme: NamedStyles<any> = {
   bgMain: { backgroundColor: Variables.mainColor },
+  bgLightMain: { backgroundColor: Variables.lightMain },
+  bgSecond: { backgroundColor: Variables.secondaryColor },
   bgBackground: { backgroundColor: Variables.backgroundColor },
   textMain: { color: Variables.mainColor },
   text: { color: Variables.textColor },

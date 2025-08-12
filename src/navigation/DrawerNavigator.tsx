@@ -1,8 +1,9 @@
 import React from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import colors from '../styles/colors';
 import Goals from '../pages/Goals';
 import Categories from '../pages/Categories';
+import Variables from '../styles/variables';
+import framework from '../styles/framework';
 
 const Drawer = createDrawerNavigator();
 
@@ -11,9 +12,10 @@ const DrawerNavigator = () => {
     <Drawer.Navigator
       initialRouteName="Goals"
       screenOptions={{
-        headerStyle: { backgroundColor: colors.primary },
-        headerTintColor: colors.background,
-        drawerActiveTintColor: colors.primary,
+        headerStyle: [framework.bgMain],
+        headerTintColor: Variables.reversedTextColor,
+        drawerActiveTintColor: Variables.mainColor,
+        drawerContentContainerStyle: [framework.bgBackground, framework.flexOne]
       }}
     >
       <Drawer.Screen name="Goals" component={Goals} />

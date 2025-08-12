@@ -7,18 +7,11 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import LinearGradient from 'react-native-linear-gradient';
 import Variables from '../../styles/variables';
 
-const Category: React.FC<CardProps<CategoryType>> = ({ record: cat, onEdit }) => {
+const CategoryCard: React.FC<CardProps<CategoryType>> = ({ record: cat, onEdit }) => {
   return (
     <TouchableOpacity
       onPress={onEdit}
-      style={[
-        style.card,
-        framework.mb2,
-        framework.justifyCenter,
-        framework.rounded,
-        framework.relative,
-        framework.overflowHidden,
-      ]}
+      style={[style.card, framework.mb2, framework.justifyCenter, framework.rounded, framework.relative, framework.overflowHidden,]}
     >
       <LinearGradient
         colors={[`${cat.color}`, `${cat.color}99`]}
@@ -51,7 +44,7 @@ const Category: React.FC<CardProps<CategoryType>> = ({ record: cat, onEdit }) =>
   );
 };
 
-export default Category;
+export default CategoryCard;
 
 const style = StyleSheet.create({
   card: {

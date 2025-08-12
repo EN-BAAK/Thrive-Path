@@ -44,7 +44,7 @@ const GoalCard: React.FC<CardProps<GoalWCategory>> = ({ record: goal, onEdit, on
             {goal.name}
           </Text>
 
-          {goal.isImportant && (
+          {Boolean(goal.isImportant) && (
             <FontAwesome5
               name="star"
               size={16}
@@ -74,7 +74,7 @@ const GoalCard: React.FC<CardProps<GoalWCategory>> = ({ record: goal, onEdit, on
 
         <View style={[framework.flexRow, framework.justifyBetween]}>
           <View style={[framework.bgWarning, framework.py1, framework.px3, framework.flexRow, framework.alignCenter, framework.gap2, framework.roundedPill]}>
-            <FontAwesome5 name="star" size={14} color={colors.white} />
+            <FontAwesome5 name="star" size={14} color={Variables.reversedTextColor} />
 
             <Text style={[framework.fontBold, framework.textSm, framework.reversedText]}>
               {goal.points} pts
@@ -82,7 +82,7 @@ const GoalCard: React.FC<CardProps<GoalWCategory>> = ({ record: goal, onEdit, on
           </View>
 
           <View style={[framework.bgInfo, framework.py1, framework.px3, framework.flexRow, framework.alignCenter, framework.gap2, framework.roundedPill]}>
-            <FontAwesome5 name="clock" size={14} color={colors.white} />
+            <FontAwesome5 name="clock" size={14} color={Variables.reversedTextColor} />
             <Text style={[framework.textSm, framework.fontBold, framework.reversedText]}>
               {formatDate(goal.deadline)}
             </Text>
@@ -92,7 +92,7 @@ const GoalCard: React.FC<CardProps<GoalWCategory>> = ({ record: goal, onEdit, on
 
       <View style={[styles.footer, framework.py2, framework.px4, framework.flexRow, framework.justifyBetween, framework.alignCenter, framework.relative]}>
         <Text style={[framework.textXs, framework.textMuted]}>
-          Updated {formatDate(goal.updatedAt)}
+          {formatDate(goal.updatedAt)}
         </Text>
 
         <TouchableOpacity onPress={() => setMenuVisible(prev => !prev)}>
