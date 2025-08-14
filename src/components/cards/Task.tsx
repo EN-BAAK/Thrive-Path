@@ -13,6 +13,7 @@ import { deleteTask, updateTaskIsCompletedById, updateTaskImportantById } from '
 import { formatDate } from '../../misc/helpers';
 import SubtaskCard from './Subtask';
 import AddSubtaskModal from '../modals/AddSubtask';
+import Button from '../forms/Button';
 
 const TaskCard: React.FC<CardProps<TaskWithCategoryAndSubtasks>> = ({ record: task, onEdit, onSuccess }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -156,13 +157,11 @@ const TaskCard: React.FC<CardProps<TaskWithCategoryAndSubtasks>> = ({ record: ta
             ))
           )}
 
-          <TouchableOpacity
-            onPress={handleAddSubtask}
-            style={[framework.bgMain, framework.py2, framework.flexRow, framework.alignCenter, framework.justifyCenter, framework.rounded]}
-          >
-            <FontAwesome5 name="plus" size={12} color={Variables.reversedTextColor} />
-            <Text style={[framework.ml2, framework.textSm, framework.reversedText,]}>Add Subtask</Text>
-          </TouchableOpacity>
+          <Button
+            msg='+ Add Subtask'
+            onPress={() => handleAddSubtask()}
+            style={[framework.px5, framework.rounded]}
+          />
         </View>
       )}
 

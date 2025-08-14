@@ -19,6 +19,7 @@ import { getCategories } from '../../api/crud/categories';
 import { createTask, updateTask } from '../../api/crud/tasks';
 import { addEditTaskValidation } from '../../constants/formValidation';
 import { AddEditTaskModalProps } from '../../types/modals';
+import Button from '../forms/Button';
 
 const AddEditTaskModal: React.FC<AddEditTaskModalProps> = ({
   visible,
@@ -87,7 +88,7 @@ const AddEditTaskModal: React.FC<AddEditTaskModalProps> = ({
                 onSubmit={handleSubmitTask}
                 enableReinitialize
               >
-                {({ handleSubmit }) => (
+                {(formik) => (
                   <>
                     <InputField
                       name="title"
@@ -141,12 +142,12 @@ const AddEditTaskModal: React.FC<AddEditTaskModalProps> = ({
                     />
 
                     <View style={[framework.flexRow, framework.justifyEnd]}>
-                      <TouchableOpacity
-                        onPress={() => handleSubmit()}
-                        style={[framework.bgMain, framework.px4, framework.py2, framework.rounded]}
-                      >
-                        <Text style={[framework.reversedText, framework.textBase]}>Save</Text>
-                      </TouchableOpacity>
+                      <Button
+                        msg='Save'
+                        onPress={() => formik.handleSubmit()}
+                        style={[framework.px5, framework.rounded]}
+                        disabled={!formik.dirty || formik.isSubmitting || !formik.isValid}
+                      />
                     </View>
                   </>
                 )}

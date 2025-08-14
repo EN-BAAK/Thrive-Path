@@ -21,6 +21,7 @@ import { addEditGoalValidation } from '../../constants/formValidation';
 import Variables from '../../styles/variables';
 import { Status } from '../../types/variables';
 import { KeyboardAvoidingView } from 'react-native';
+import Button from '../forms/Button';
 
 const AddEditGoalModal: React.FC<AddEditGoalModalProps> = ({
   visible,
@@ -104,7 +105,7 @@ const AddEditGoalModal: React.FC<AddEditGoalModalProps> = ({
                 onSubmit={handleSubmittingGoal}
                 enableReinitialize
               >
-                {({ handleSubmit }) => (
+                {(formik) => (
                   <>
                     <InputField
                       name="name"
@@ -179,12 +180,12 @@ const AddEditGoalModal: React.FC<AddEditGoalModalProps> = ({
                     />
 
                     <View style={[framework.flexRow, framework.justifyEnd]}>
-                      <TouchableOpacity
-                        onPress={() => handleSubmit()}
-                        style={[framework.bgMain, framework.px4, framework.py2, framework.rounded]}
-                      >
-                        <Text style={[framework.reversedText, framework.textBase]}>Save</Text>
-                      </TouchableOpacity>
+                      <Button
+                        msg='Save'
+                        onPress={() => formik.handleSubmit()}
+                        style={[framework.px5, framework.rounded]}
+                        disabled={!formik.dirty || formik.isSubmitting || !formik.isValid}
+                      />
                     </View>
                   </>
                 )}

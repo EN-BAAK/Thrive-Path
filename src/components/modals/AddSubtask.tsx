@@ -11,6 +11,7 @@ import { addEditSubtaskValidation } from '../../constants/formValidation';
 import { defaultSubtask } from '../../constants/formValues';
 import { createSubtask } from '../../api/crud/tasks';
 import { AddSubtaskModalProps } from '../../types/modals';
+import Button from '../forms/Button';
 
 const AddSubtaskModal: React.FC<AddSubtaskModalProps> = ({ visible, onClose, onSave, parentTaskId, }) => {
   const handleSubmitSubtask = async (values: SafeSubtask) => {
@@ -47,7 +48,7 @@ const AddSubtaskModal: React.FC<AddSubtaskModalProps> = ({ visible, onClose, onS
                 onSubmit={handleSubmitSubtask}
                 enableReinitialize
               >
-                {({ handleSubmit }) => (
+                {(formik) => (
                   <>
                     <InputField
                       name="title"
@@ -82,12 +83,12 @@ const AddSubtaskModal: React.FC<AddSubtaskModalProps> = ({ visible, onClose, onS
                     />
 
                     <View style={[framework.flexRow, framework.justifyEnd]}>
-                      <TouchableOpacity
-                        onPress={() => handleSubmit()}
-                        style={[framework.bgMain, framework.px4, framework.py2, framework.rounded]}
-                      >
-                        <Text style={[framework.reversedText, framework.textBase]}>Save</Text>
-                      </TouchableOpacity>
+                      <Button
+                        msg='Save'
+                        onPress={() => formik.handleSubmit()}
+                        style={[framework.px5, framework.rounded]}
+                        disabled={!formik.dirty || formik.isSubmitting || !formik.isValid}
+                      />
                     </View>
                   </>
                 )}

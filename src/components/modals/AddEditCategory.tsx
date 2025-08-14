@@ -9,6 +9,7 @@ import { addEditCategoryValidation } from '../../constants/formValidation';
 import { AddEditCategoryModalProps } from '../../types/modals';
 import ColorPickerField from '../forms/ColorPickerField';
 import IconPickerField from '../forms/IconPickerField';
+import Button from '../forms/Button';
 
 const AddEditCategoryModal: React.FC<AddEditCategoryModalProps> = ({
   visible,
@@ -55,7 +56,7 @@ const AddEditCategoryModal: React.FC<AddEditCategoryModalProps> = ({
               onSubmit={handleSubmitCategory}
               enableReinitialize
             >
-              {({ handleSubmit }) => (
+              {(formik) => (
                 <>
                   <InputField
                     name="name"
@@ -80,12 +81,12 @@ const AddEditCategoryModal: React.FC<AddEditCategoryModalProps> = ({
                   />
 
                   <View style={[framework.flexRow, framework.justifyEnd]}>
-                    <TouchableOpacity
-                      onPress={() => handleSubmit()}
-                      style={[framework.bgMain, framework.px4, framework.py2, framework.rounded]}
-                    >
-                      <Text style={[framework.reversedText, framework.textBase]}>Save</Text>
-                    </TouchableOpacity>
+                    <Button
+                      msg='Save'
+                      onPress={() => formik.handleSubmit()}
+                      style={[framework.px5, framework.rounded]}
+                      disabled={!formik.dirty || formik.isSubmitting || !formik.isValid }
+                    />
                   </View>
                 </>
               )}

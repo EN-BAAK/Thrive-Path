@@ -2,7 +2,6 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { View, FlatList, RefreshControl } from 'react-native';
 import { TaskWithCategoryAndSubtasks, Task } from '../types/schemas';
 import framework from '../styles/framework';
-import colors from '../styles/colors';
 import Loading from './Loading';
 import EmptyContent from '../components/EmptyContent';
 import TaskCard from '../components/cards/Task';
@@ -11,6 +10,7 @@ import AddEditTaskModal from '../components/modals/AddEditTask';
 import { defaultTask } from '../constants/formValues';
 import { omit } from '../misc/helpers';
 import FloatingButton from '../components/FloatingButton';
+import Variables from '../styles/variables';
 
 const Tasks: React.FC = (): React.JSX.Element => {
   const [tasks, setTasks] = useState<TaskWithCategoryAndSubtasks[]>([]);
@@ -24,15 +24,11 @@ const Tasks: React.FC = (): React.JSX.Element => {
       const data = await findAllTasks();
       setTasks(data);
     } catch (e) {
-      console.log('[Tasks] load error', e);
+      console.error('[TASKS] load error', e);
     } finally {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    load();
-  }, []);
 
   const onRefresh = useCallback(async () => {
     try {
@@ -40,7 +36,7 @@ const Tasks: React.FC = (): React.JSX.Element => {
       const data = await findAllTasks();
       setTasks(data);
     } catch (e) {
-      console.log('[Tasks] refresh error', e);
+      console.error('[TASKS] refresh error', e);
     } finally {
       setRefreshing(false);
     }
@@ -53,6 +49,11 @@ const Tasks: React.FC = (): React.JSX.Element => {
   const onEdit = (task: TaskWithCategoryAndSubtasks) => {
     setSelectedTask(omit(task, ['categoryName', 'categoryColor', "subtasks"]));
   };
+
+  useEffect(() => {
+    load();
+  }, []);
+
 
   if (loading) return <Loading />;
 
@@ -88,7 +89,7 @@ const Tasks: React.FC = (): React.JSX.Element => {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={colors.primary}
+            tintColor={Variables.mainColor}
           />
         }
         renderItem={({ item }) => (
@@ -110,7 +111,7 @@ const Tasks: React.FC = (): React.JSX.Element => {
       )}
 
       <FloatingButton
-        msg='Add task'
+        msg='+ Add task'
         action={() => setSelectedTask(defaultTask)}
         right={8}
         bottom={8}

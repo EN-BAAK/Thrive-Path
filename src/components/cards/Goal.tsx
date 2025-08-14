@@ -56,7 +56,7 @@ const GoalCard: React.FC<CardProps<GoalWCategory>> = ({ record: goal, onEdit, on
 
   return (
     <View style={[framework.card, framework.bgBackground, framework.p0, framework.overflowHidden]}>
-      <View style={[styles.categoryBar, framework.h100, framework.absolute, framework.top0, framework.left0, { backgroundColor: goal.categoryColor}]} />
+      <View style={[styles.categoryBar, framework.h100, framework.absolute, framework.top0, framework.left0, { backgroundColor: goal.categoryColor }]} />
 
       <LinearGradient
         colors={[goal.categoryColor, `${goal.categoryColor}99`]}
@@ -67,14 +67,31 @@ const GoalCard: React.FC<CardProps<GoalWCategory>> = ({ record: goal, onEdit, on
             {goal.name}
           </Text>
 
-          <TouchableOpacity onPress={handleIsImportantToggle}>
-            <AntDesign
-              name={goal.isImportant ? "star" : "staro"}
-              size={16}
-              color={colors.warning}
-              style={[framework.ml2, framework.mt1]}
-            />
-          </TouchableOpacity>
+          <View style={[framework.flexRow, framework.alignCenter, framework.justifyBetween, framework.gap3]}>
+            <TouchableOpacity onPress={handleIsImportantToggle}>
+              <AntDesign
+                name={goal.isImportant ? "star" : "staro"}
+                size={16}
+                color={colors.warning}
+                style={[framework.ml2, framework.mt1]}
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => setMenuVisible(prev => !prev)} hitSlop={10}>
+              <FontAwesome5 name="ellipsis-v" size={16} color={Variables.reversedTextColor} />
+            </TouchableOpacity>
+
+            {menuVisible && (
+              <View style={[framework.bgLight, framework.rounded, framework.shadowLight, framework.absolute, framework.top0, framework.right4, framework.overflowHidden]}>
+                <TouchableOpacity onPress={onEdit} style={[styles.menuItem, framework.py2, framework.px4]}>
+                  <Text>Edit</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handleDelete} style={[styles.menuItem, framework.py2, framework.px4]}>
+                  <Text>Delete</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
 
         </View>
         <Text style={[framework.mt1, framework.textSm, framework.reversedText]}>
@@ -141,25 +158,10 @@ const GoalCard: React.FC<CardProps<GoalWCategory>> = ({ record: goal, onEdit, on
         </View>
       </View>
 
-      <View style={[styles.footer, framework.py2, framework.px4, framework.flexRow, framework.justifyBetween, framework.alignCenter, framework.relative]}>
+      <View style={[styles.footer, framework.py2, framework.px4]}>
         <Text style={[framework.textXs, framework.textMuted]}>
           {formatDate(goal.updatedAt)}
         </Text>
-
-        <TouchableOpacity onPress={() => setMenuVisible(prev => !prev)}>
-          <FontAwesome5 name="ellipsis-v" size={16} color={colors.muted} />
-        </TouchableOpacity>
-
-        {menuVisible && (
-          <View style={[styles.menu, framework.bgLight, framework.rounded, framework.shadowLight, framework.absolute, framework.right4, framework.overflowHidden]}>
-            <TouchableOpacity onPress={onEdit} style={[styles.menuItem, framework.py2, framework.px4]}>
-              <Text>Edit</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleDelete} style={[styles.menuItem, framework.py2, framework.px4]}>
-              <Text>Delete</Text>
-            </TouchableOpacity>
-          </View>
-        )}
       </View>
     </View>
   );
@@ -179,9 +181,6 @@ const styles = StyleSheet.create({
   footer: {
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: colors.lightGray,
-  },
-  menu: {
-    top: -80,
   },
   menuItem: {
     borderBottomWidth: StyleSheet.hairlineWidth,

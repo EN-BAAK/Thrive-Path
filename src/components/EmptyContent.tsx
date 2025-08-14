@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet } from 'react-native';
 import framework from '../styles/framework';
 import NotFoundImage from "../assets/images/no-data.png"
 import { EmptyContentProps } from '../types/components';
+import Button from './forms/Button';
 
 const EmptyContent: React.FC<EmptyContentProps> = ({
   message,
@@ -24,14 +25,9 @@ const EmptyContent: React.FC<EmptyContentProps> = ({
 
       {
         buttonText && onButtonPress && (
-          <TouchableOpacity
-            onPress={onButtonPress}
-            style={[framework.bgMain, framework.px4, framework.py2, framework.rounded,]}
-          >
-            <Text style={[framework.textWhite, framework.textBase, framework.textCapitalize]}>
-              {buttonText}
-            </Text>
-          </TouchableOpacity>
+          <Button
+            msg={buttonText}
+          />
         )
       }
     </View >

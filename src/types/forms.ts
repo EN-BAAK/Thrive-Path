@@ -1,5 +1,7 @@
-import { TextInputProps, ViewStyle } from "react-native";
-import { SelectOption } from "./variables";
+import React from "react";
+import { StyleProp, TextInputProps, TextStyle, TouchableOpacity, ViewStyle } from "react-native";
+import { ButtonVariant, SelectOption } from "./variables";
+import { GestureResponderEvent } from "react-native";
 
 export type TrackColor = {
   true: string,
@@ -46,4 +48,13 @@ export interface SelectFieldProps extends FieldProps {
 
 export interface ColorPickerFieldProps extends FieldProps { }
 
-export interface IconPickerFieldProps extends FieldProps {}
+export interface IconPickerFieldProps extends FieldProps { }
+
+export type ButtonProps = {
+  msg: string;
+  variant?: ButtonVariant;
+  style?: StyleProp<ViewStyle>;
+  textStyle?: StyleProp<TextStyle>;
+  disabled?: boolean;
+  onPress?: (event: GestureResponderEvent) => void;
+} & Omit<React.ComponentProps<typeof TouchableOpacity>, 'style' | 'onPress'>;

@@ -43,3 +43,5 @@ export type ThemeColors = {
   textColor: string;
   reversedTextColor: string
 };
+
+export type ButtonVariant = 'main' | 'main-outline';

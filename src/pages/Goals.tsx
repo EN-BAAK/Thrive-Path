@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { ScrollView, View, TouchableOpacity, Text } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { FlatList, RefreshControl, View } from 'react-native';
 import { Goal, GoalWCategory } from '../types/schemas';
 import { findAllGoals } from '../api/crud/goals';
 import GoalCard from '../components/cards/Goal';
@@ -9,10 +9,13 @@ import AddEditGoalModal from '../components/modals/AddEditGoal';
 import framework from '../styles/framework';
 import { defaultGoal } from '../constants/formValues';
 import { omit } from '../misc/helpers';
+import FloatingButton from '../components/FloatingButton';
+import Variables from '../styles/variables';
 
 const Goals: React.FC = (): React.JSX.Element => {
   const [goals, setGoals] = useState<GoalWCategory[]>([]);
   const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchGoals = async () => {
@@ -26,6 +29,18 @@ const Goals: React.FC = (): React.JSX.Element => {
       setIsLoading(false);
     }
   };
+
+  const onRefresh = useCallback(async () => {
+    try {
+      setRefreshing(true);
+      const data = await findAllGoals();
+      setGoals(data);
+    } catch (e) {
+      console.error('[GOALS] refresh error', e);
+    } finally {
+      setRefreshing(false);
+    }
+  }, []);
 
   const onEdit = (goal: GoalWCategory) => {
     setSelectedGoal(omit(goal, ['categoryName', 'categoryColor']));
@@ -59,28 +74,26 @@ const Goals: React.FC = (): React.JSX.Element => {
 
   return (
     <View style={[framework.bgBackground, framework.flexOne]}>
-      <ScrollView
-        style={[framework.px2]}
+      <FlatList
+        data={goals}
+        keyExtractor={item => String(item.id)}
         contentContainerStyle={[framework.py2]}
-      >
-        {goals.map((goal) => (
+        style={[framework.px2]}
+        renderItem={({ item }) => (
           <GoalCard
-            key={goal.id}
-            record={goal}
-            onEdit={() => onEdit(goal)}
+            record={item}
+            onEdit={() => onEdit(item)}
             onSuccess={fetchGoals}
           />
-        ))}
-      </ScrollView>
-
-      <TouchableOpacity
-        style={[framework.bgMain, framework.px4, framework.py2, framework.rounded, framework.absolute, framework.bottom1, framework.right1,]}
-        onPress={() => setSelectedGoal(defaultGoal)}
-      >
-        <Text style={[framework.reversedText, framework.fontBold]}>
-          + Add Goal
-        </Text>
-      </TouchableOpacity>
+        )}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={Variables.mainColor}
+          />
+        }
+      />
 
       {selectedGoal && (
         <AddEditGoalModal
@@ -90,6 +103,13 @@ const Goals: React.FC = (): React.JSX.Element => {
           initialGoal={selectedGoal}
         />
       )}
+
+      <FloatingButton
+        msg='+ Add Goal'
+        action={() => setSelectedGoal(defaultGoal)}
+        right={8}
+        bottom={8}
+      />
     </View>
   );
 };

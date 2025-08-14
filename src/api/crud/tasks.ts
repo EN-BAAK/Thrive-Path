@@ -34,7 +34,6 @@ export const createSubtask = async (subtask: SafeSubtask, parentTaskId: number) 
 export const findAllTasks = async (): Promise<TaskWithCategoryAndSubtasks[]> => {
   try {
     const tasksDB = await initializeTableFunctions(getDatabase, TASKS_TABLE);
-    console.log("Initialize", tasksDB)
     const allTasks = await tasksDB.findAll<TaskWithCategoryAndSubtasks>(
       [],
       'tasks.createdAt DESC',
@@ -61,13 +60,11 @@ export const findAllTasks = async (): Promise<TaskWithCategoryAndSubtasks[]> => 
         { column: 'updatedAt', alias: 'updatedAt' }
       ]
     );
-    console.log("Data", allTasks)
     const subtasksDB = await initializeTableFunctions(getDatabase, SUBTASKS_TABLE);
     for (const task of allTasks) {
       const subtasks = await subtasksDB.findAll<Subtask>(
         [{ table: 'subtasks', field: 'parentTaskId', value: task.id }]
       );
-      console.log("Subtasks", subtasks)
       task.subtasks = subtasks;
     }
 

@@ -375,7 +375,7 @@ const textFormat: NamedStyles<any> = {
   },
   textCapitalize: {
     textTransform: "capitalize"
-  }
+  },
 }
 
 const textWeights: NamedStyles<any> = {
