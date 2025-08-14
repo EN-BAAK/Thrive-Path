@@ -4,6 +4,7 @@ import Goals from '../pages/Goals';
 import Categories from '../pages/Categories';
 import Variables from '../styles/variables';
 import framework from '../styles/framework';
+import Tasks from '../pages/Tasks';
 
 const Drawer = createDrawerNavigator();
 
@@ -20,6 +21,7 @@ const DrawerNavigator = () => {
     >
       <Drawer.Screen name="Goals" component={Goals} />
       <Drawer.Screen name="Categories" component={Categories} />
+      <Drawer.Screen name="Tasks" component={Tasks} />
     </Drawer.Navigator>
   );
 };

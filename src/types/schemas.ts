@@ -17,8 +17,8 @@ export type Goal = {
 export type SafetyGoal = Omit<Goal, 'id' | 'createdAt' | 'updatedAt'>;
 
 export type GoalWCategory = Goal & {
-  categoryName?: string,
-  categoryColor?: string
+  categoryName: string,
+  categoryColor: string
 }
 
 export type Category = {
@@ -29,3 +29,34 @@ export type Category = {
 }
 
 export type SafeCategory = Omit<Category, 'id'>;
+
+export type Task = {
+  id: number;
+  title: string;
+  description?: string;
+  isCompleted: boolean;
+  isImportant: boolean;
+  categoryId?: number;
+  points: number,
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type SafeTask = Omit<Task, 'id' | 'createdAt' | 'updatedAt'>;
+
+export type Subtask = {
+  id: number;
+  title: string;
+  isCompleted: boolean;
+  points: number,
+  isImportant: boolean;
+  parentTaskId: number;
+};
+
+export type SafeSubtask = Omit<Subtask, 'id' | 'parentTaskId'>;
+
+export type TaskWithCategoryAndSubtasks = Task & {
+  categoryName: string;
+  categoryColor: string;
+  subtasks: Subtask[];
+};

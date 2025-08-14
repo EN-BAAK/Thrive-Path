@@ -1,5 +1,6 @@
 import * as Yup from 'yup';
 import { iconList } from '../misc/global';
+import { Status } from '../types/variables';
 
 export const addEditGoalValidation = Yup.object().shape({
   name: Yup.string()
@@ -13,7 +14,6 @@ export const addEditGoalValidation = Yup.object().shape({
   isImportant: Yup.boolean(),
 
   points: Yup.number()
-    .required('Points are required')
     .positive('Points must be positive')
     .integer('Points must be an integer'),
 
@@ -21,8 +21,8 @@ export const addEditGoalValidation = Yup.object().shape({
     .required('Deadline is required')
     .typeError('Deadline must be a valid date'),
 
-  status: Yup.mixed<'PENDING' | 'COMPLETED' | 'CANCELED'>()
-    .oneOf(['PENDING', 'COMPLETED', 'CANCELED'], 'Invalid status')
+  status: Yup.mixed<Status>()
+    .oneOf([Status.CANCELED, Status.COMPLETED, Status.PENDING], 'Invalid status')
     .required('Status is required'),
 
   priority: Yup.number()
@@ -41,4 +41,42 @@ export const addEditCategoryValidation = Yup.object().shape({
   icon: Yup.string()
     .oneOf(iconList, "Invalid icon")
     .required('Icon is required'),
+});
+
+export const addEditTaskValidation = Yup.object().shape({
+  title: Yup.string()
+    .required('Title is required')
+    .min(2, 'Title must be at least 2 characters')
+    .max(100, 'Title must be less than 100 characters'),
+
+  description: Yup.string()
+    .max(500, 'Description must be less than 500 characters')
+    .nullable(),
+
+  points: Yup.number()
+    .positive('Points must be positive')
+    .integer('Points must be an integer'),
+
+  isImportant: Yup.boolean().required(),
+
+  isCompleted: Yup.boolean().required(),
+
+  categoryId: Yup.number()
+    .required('Category is required')
+    .typeError('Invalid category selection'),
+});
+
+export const addEditSubtaskValidation = Yup.object().shape({
+  title: Yup.string()
+    .required('Title is required')
+    .min(2, 'Title must be at least 2 characters')
+    .max(100, 'Title must be less than 100 characters'),
+
+  points: Yup.number()
+    .positive('Points must be positive')
+    .integer('Points must be an integer'),
+
+  isImportant: Yup.boolean().required(),
+
+  isCompleted: Yup.boolean().required(),
 });

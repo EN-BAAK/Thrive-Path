@@ -22,6 +22,7 @@ const statusList = [Status.PENDING, Status.COMPLETED, Status.CANCELED];
 const GoalCard: React.FC<CardProps<GoalWCategory>> = ({ record: goal, onEdit, onSuccess }) => {
   const [menuVisible, setMenuVisible] = useState(false);
   const [statusMenuVisible, setStatusMenuVisible] = useState(false);
+
   const statusColor = goal.status ? statusColors[goal.status] : colors.secondary;
 
   const handleDelete = async () => {
@@ -54,11 +55,11 @@ const GoalCard: React.FC<CardProps<GoalWCategory>> = ({ record: goal, onEdit, on
   }
 
   return (
-    <View style={[styles.card, framework.card, framework.bgBackground, framework.p0]}>
-      <View style={[styles.categoryBar, framework.h100, framework.absolute, framework.top0, framework.left0, { backgroundColor: goal.categoryColor || colors.primary }]} />
+    <View style={[framework.card, framework.bgBackground, framework.p0, framework.overflowHidden]}>
+      <View style={[styles.categoryBar, framework.h100, framework.absolute, framework.top0, framework.left0, { backgroundColor: goal.categoryColor}]} />
 
       <LinearGradient
-        colors={[goal.categoryColor || Variables.mainColor, `${goal.categoryColor || Variables.mainColor}99`]}
+        colors={[goal.categoryColor, `${goal.categoryColor}99`]}
         style={[framework.p4, framework.pb2]}
       >
         <View style={[framework.flexRow, framework.justifyBetween]}>
@@ -76,13 +77,9 @@ const GoalCard: React.FC<CardProps<GoalWCategory>> = ({ record: goal, onEdit, on
           </TouchableOpacity>
 
         </View>
-
-        {goal.categoryName && (
-          <Text style={[framework.mt1, framework.textSm, framework.reversedText]}>
-            {goal.categoryName}
-          </Text>
-        )}
-
+        <Text style={[framework.mt1, framework.textSm, framework.reversedText]}>
+          {goal.categoryName}
+        </Text>
 
         {goal.status && (
           <TouchableOpacity
@@ -171,9 +168,6 @@ const GoalCard: React.FC<CardProps<GoalWCategory>> = ({ record: goal, onEdit, on
 export default GoalCard;
 
 const styles = StyleSheet.create({
-  card: {
-    overflow: 'hidden',
-  },
   categoryBar: {
     width: 5,
     zIndex: 2,

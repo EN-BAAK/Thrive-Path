@@ -11,7 +11,7 @@ const CategoryCard: React.FC<CardProps<CategoryType>> = ({ record: cat, onEdit }
   return (
     <TouchableOpacity
       onPress={onEdit}
-      style={[style.card, framework.mb2, framework.justifyCenter, framework.rounded, framework.relative, framework.overflowHidden,]}
+      style={[framework.card, style.card, framework.mb2, framework.p0, framework.justifyCenter, framework.rounded, framework.relative, framework.overflowHidden]}
     >
       <LinearGradient
         colors={[`${cat.color}`, `${cat.color}99`]}
@@ -49,11 +49,8 @@ export default CategoryCard;
 const style = StyleSheet.create({
   card: {
     height: 160,
-    shadowColor: '#000',
     shadowOpacity: 0.01,
     shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 8,
-    elevation: 3,
   },
   gradient: {
     zIndex: 1

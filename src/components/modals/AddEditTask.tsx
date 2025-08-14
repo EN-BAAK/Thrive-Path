@@ -5,28 +5,26 @@ import {
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { Formik } from 'formik';
-import { AddEditGoalModalProps } from '../../types/modals';
-import { Category, SafetyGoal } from '../../types/schemas';
-import { getCategories } from '../../api/crud/categories';
-import { createGoal, updateGoal } from '../../api/crud/goals';
 import framework from '../../styles/framework';
+import colors from '../../styles/colors';
+import Variables from '../../styles/variables';
 import InputField from '../forms/InputField';
 import SwitchField from '../forms/SwitchField';
-import colors from '../../styles/colors';
-import DatePickerField from '../forms/DatePickerField';
 import SelectField from '../forms/SelectField';
-import { addEditGoalValidation } from '../../constants/formValidation';
-import Variables from '../../styles/variables';
-import { Status } from '../../types/variables';
-import { KeyboardAvoidingView } from 'react-native';
+import { Category, SafeTask, Task } from '../../types/schemas';
+import { getCategories } from '../../api/crud/categories';
+import { createTask, updateTask } from '../../api/crud/tasks';
+import { addEditTaskValidation } from '../../constants/formValidation';
+import { AddEditTaskModalProps } from '../../types/modals';
 
-const AddEditGoalModal: React.FC<AddEditGoalModalProps> = ({
+const AddEditTaskModal: React.FC<AddEditTaskModalProps> = ({
   visible,
   onClose,
   onSave,
-  initialGoal,
+  initialTask,
 }) => {
   const [categories, setCategories] = useState<Category[]>([]);
 
@@ -35,7 +33,7 @@ const AddEditGoalModal: React.FC<AddEditGoalModalProps> = ({
       const cats = await getCategories();
       setCategories(cats);
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      console.error('[AddEditTaskModal] Error fetching categories:', error);
     }
   };
 
@@ -45,26 +43,26 @@ const AddEditGoalModal: React.FC<AddEditGoalModalProps> = ({
     }
   }, [visible]);
 
-  const handleSubmittingGoal = async (values: SafetyGoal) => {
+  const handleSubmitTask = async (values: SafeTask) => {
     try {
-      const payload = {
-        ...initialGoal,
+      const payload: Task = {
+        ...initialTask,
         ...values,
-        id: initialGoal?.id ?? -1,
-        createdAt: initialGoal?.createdAt || new Date().toISOString(),
+        id: initialTask?.id ?? -1,
+        createdAt: initialTask?.createdAt || new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
 
       if (payload.id === -1) {
-        await createGoal(payload);
+        await createTask(payload);
       } else {
-        await updateGoal(payload.id, payload);
+        await updateTask(payload.id, payload);
       }
 
       onSave();
       onClose();
     } catch (error) {
-      console.error('[AddEditGoalModal] Failed to save goal:', error);
+      console.error('[AddEditTaskModal] Failed to save task:', error);
     }
   };
 
@@ -75,49 +73,34 @@ const AddEditGoalModal: React.FC<AddEditGoalModalProps> = ({
         style={[framework.bgLayout, framework.flexOne, framework.justifyCenter, framework.px3]}
         onPress={onClose}
       >
-        <KeyboardAvoidingView
-          behavior='height'
-          style={[framework.w100]}
-          keyboardVerticalOffset={0}
-        >
+        <KeyboardAvoidingView behavior="height" style={framework.w100} keyboardVerticalOffset={0}>
           <TouchableWithoutFeedback>
             <View style={[framework.bgBackground, framework.p4, framework.roundedMd, framework.shadowMedium]}>
-              <Text
-                style={[
-                  framework.bgMain,
-                  framework.mb4,
-                  framework.py2,
-                  framework.px4,
-                  framework.roundedBottomMd,
-                  framework.textCenter,
-                  framework.fontBold,
-                  framework.textXl,
-                  framework.reversedText,
-                ]}
+              <Text style={[framework.bgMain, framework.mb4, framework.py2, framework.px4, framework.roundedBottomMd, framework.textCenter, framework.fontBold, framework.textXl, framework.reversedText]}
               >
-                {initialGoal?.id === -1 ? 'Add New Goal' : 'Edit Goal'}
+                {initialTask?.id === -1 ? 'Add New Task' : 'Edit Task'}
               </Text>
 
-              <Formik<SafetyGoal>
-                initialValues={initialGoal}
-                validationSchema={addEditGoalValidation}
-                onSubmit={handleSubmittingGoal}
+              <Formik<SafeTask>
+                initialValues={initialTask}
+                validationSchema={addEditTaskValidation}
+                onSubmit={handleSubmitTask}
                 enableReinitialize
               >
                 {({ handleSubmit }) => (
                   <>
                     <InputField
-                      name="name"
-                      label="Name"
+                      name="title"
+                      label="Title"
                       required
-                      placeholder="Enter name"
+                      placeholder="Enter task title"
                       containerStyle={framework.mb2}
                     />
 
                     <InputField
                       name="description"
                       label="Description"
-                      placeholder="Enter description"
+                      placeholder="Enter task description"
                       containerStyle={framework.mb2}
                       multiLine
                     />
@@ -138,32 +121,12 @@ const AddEditGoalModal: React.FC<AddEditGoalModalProps> = ({
                       containerStyle={framework.mb2}
                     />
 
-                    <DatePickerField
-                      name="deadline"
-                      label="Deadline"
-                      required
+                    <SwitchField
+                      name="isCompleted"
+                      label="Completed?"
                       containerStyle={framework.mb2}
-                    />
-
-                    <SelectField
-                      name="status"
-                      label="Status"
-                      required
-                      options={[
-                        { label: Status.PENDING, value: Status.PENDING },
-                        { label: Status.COMPLETED, value: Status.COMPLETED },
-                        { label: Status.CANCELED, value: Status.CANCELED },
-                      ]}
-                      containerStyle={framework.mb2}
-                    />
-
-                    <InputField
-                      name="priority"
-                      label="Priority"
-                      required
-                      placeholder="Enter priority"
-                      type="numeric"
-                      containerStyle={framework.mb2}
+                      trackColor={{ true: colors.success, false: Variables.secondaryColor }}
+                      thumbColor={{ true: colors.success, false: colors.gray }}
                     />
 
                     <SelectField
@@ -174,7 +137,6 @@ const AddEditGoalModal: React.FC<AddEditGoalModalProps> = ({
                         label: c.name,
                         value: c.id,
                       }))}
-                      required
                       containerStyle={framework.mb3}
                     />
 
@@ -197,4 +159,4 @@ const AddEditGoalModal: React.FC<AddEditGoalModalProps> = ({
   );
 };
 
-export default AddEditGoalModal;
+export default AddEditTaskModal;

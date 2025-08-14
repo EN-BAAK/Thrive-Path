@@ -17,7 +17,8 @@ const backgrounds: NamedStyles<any> = {
   bgInfo: { backgroundColor: colors.info },
   bgLight: { backgroundColor: colors.light },
   bgDark: { backgroundColor: colors.dark },
-  bgLayout: { backgroundColor: colors.layout }
+  bgLayout: { backgroundColor: colors.layout },
+  bgTransparent: { backgroundColor: "transparent" }
 };
 
 const spacing: NamedStyles<any> = {
