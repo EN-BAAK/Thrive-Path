@@ -7,7 +7,16 @@ export enum Status {
   COMPLETED = "COMPLETED",
   CANCELED = "CANCELED"
 }
-
+export enum HabitType {
+  GOOD = "GOOD",
+  BAD = "BAD"
+}
+export enum RepeatInterval {
+  DAILY = "DAILY",
+  WEEKLY = "WEEKLY",
+  MONTHLY = "MONTHLY",
+  CUSTOM = "CUSTOM"
+}
 
 export interface Condition {
   table?: string;

@@ -7,6 +7,8 @@ export const initializeDatabase = async () => {
   // await db.executeSql(`DROP TABLE IF EXISTS tasks`)
   // await db.executeSql(`DROP TABLE IF EXISTS subtasks`)
   // await db.executeSql(`DROP TABLE IF EXISTS categories`)
+  // await db.executeSql(`DROP TABLE IF EXISTS habits`)
+  // await db.executeSql(`DROP TABLE IF EXISTS challenges`)
 
   await db.executeSql(`
     CREATE TABLE IF NOT EXISTS categories (
@@ -62,12 +64,67 @@ export const initializeDatabase = async () => {
     );
   `);
 
-  await db.executeSql(`CREATE INDEX IF NOT EXISTS idx_goals_status ON goals(status);`);
+  await db.executeSql(`
+  CREATE TABLE IF NOT EXISTS habits (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    description TEXT,
+    habitType TEXT DEFAULT 'GOOD' NOT NULL,
+    winPoints INTEGER DEFAULT 0,
+    losePoints INTEGER DEFAULT 0,
+    repeatInterval TEXT DEFAULT 'DAILY',
+    customIntervalDays INTEGER,
+    maxHearts INTEGER DEFAULT 0,
+    currentHearts INTEGER DEFAULT 0,
+    maxStars INTEGER DEFAULT 0,
+    currentStars INTEGER DEFAULT 0,
+    deadline TEXT,
+    isActive INTEGER DEFAULT 1,
+    categoryId INTEGER,
+    goalId INTEGER,
+    createdAt TEXT DEFAULT (datetime('now')),
+    updatedAt TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (categoryId) REFERENCES categories(id) ON DELETE SET NULL,
+    FOREIGN KEY (goalId) REFERENCES goals(id) ON DELETE SET NULL
+  );
+`);
+
+  await db.executeSql(`
+  CREATE TABLE IF NOT EXISTS challenges (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    description TEXT,
+    goalPoints INTEGER DEFAULT 0,
+    penaltyPoints INTEGER DEFAULT 0,
+    targetValue INTEGER,
+    progressValue INTEGER DEFAULT 0,
+    startDate TEXT NOT NULL,
+    endDate TEXT NOT NULL,
+    linkedHabitId INTEGER,
+    isCompleted INTEGER DEFAULT 0,
+    isActive INTEGER DEFAULT 1,
+    categoryId INTEGER,
+    goalId INTEGER,
+    createdAt TEXT DEFAULT (datetime('now')),
+    updatedAt TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (linkedHabitId) REFERENCES habits(id) ON DELETE SET NULL,
+    FOREIGN KEY (categoryId) REFERENCES categories(id) ON DELETE SET NULL,
+    FOREIGN KEY (goalId) REFERENCES goals(id) ON DELETE SET NULL
+  );
+`);
+
+
+  await db.executeSql(`CREATE INDEX IF NOT EXISTS idx_goals_title ON goals(title);`);
   await db.executeSql(`CREATE INDEX IF NOT EXISTS idx_goals_priority ON goals(priority);`);
+
   await db.executeSql(`CREATE INDEX IF NOT EXISTS idx_categories_name ON categories(name);`);
 
   await db.executeSql(`CREATE INDEX IF NOT EXISTS idx_tasks_title ON tasks(title);`);
   await db.executeSql(`CREATE INDEX IF NOT EXISTS idx_subtasks_title ON subtasks(title);`);
+
+  await db.executeSql(`CREATE INDEX IF NOT EXISTS idx_habits_title ON habits(title);`);
+
+  await db.executeSql(`CREATE INDEX IF NOT EXISTS idx_challenges_title ON challenges(title);`);
 
   return db;
 };
