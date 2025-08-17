@@ -37,8 +37,8 @@ const AddEditHabitModal: React.FC<AddEditHabitModalProps> = ({
 
   const fetchGoals = async () => {
     try {
-      const goals = await findGoalIdentities();
-      setGoals(goals);
+      const data = await findGoalIdentities();
+      setGoals(data);
     } catch (error) {
       console.error('Error fetching goals:', error);
     }
