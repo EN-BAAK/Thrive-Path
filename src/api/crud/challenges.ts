@@ -30,17 +30,17 @@ export const findAllChallenges = async (): Promise<Challenge[]> => {
         { column: 'id', alias: 'id' },
         { column: 'title', alias: 'title' },
         { column: 'description', alias: 'description' },
-        { column: 'goalPoints', alias: 'goalPoints' },
+        { column: 'points', alias: 'points' },
         { column: 'penaltyPoints', alias: 'penaltyPoints' },
         { column: 'targetValue', alias: 'targetValue' },
-        { column: 'progressValue', alias: 'progressValue' },
         { column: 'startDate', alias: 'startDate' },
         { column: 'endDate', alias: 'endDate' },
-        { column: 'linkedHabitId', alias: 'linkedHabitId' },
+        { column: 'maxHearts', alias: 'maxHearts' },
+        { column: 'currentHearts', alias: 'currentHearts' },
+        { column: 'maxStars', alias: 'maxStars' },
+        { column: 'currentStars', alias: 'currentStars' },
         { column: 'isCompleted', alias: 'isCompleted' },
-        { column: 'isActive', alias: 'isActive' },
         { column: 'categoryId', alias: 'categoryId' },
-        { column: 'goalId', alias: 'goalId' },
         { column: 'createdAt', alias: 'createdAt' },
         { column: 'updatedAt', alias: 'updatedAt' }
       ]
@@ -61,17 +61,17 @@ export const findChallengeById = async (id: number): Promise<Challenge | null> =
         { column: 'id', alias: 'id' },
         { column: 'title', alias: 'title' },
         { column: 'description', alias: 'description' },
-        { column: 'goalPoints', alias: 'goalPoints' },
+        { column: 'points', alias: 'points' },
         { column: 'penaltyPoints', alias: 'penaltyPoints' },
         { column: 'targetValue', alias: 'targetValue' },
-        { column: 'progressValue', alias: 'progressValue' },
         { column: 'startDate', alias: 'startDate' },
         { column: 'endDate', alias: 'endDate' },
-        { column: 'linkedHabitId', alias: 'linkedHabitId' },
+        { column: 'maxHearts', alias: 'maxHearts' },
+        { column: 'currentHearts', alias: 'currentHearts' },
+        { column: 'maxStars', alias: 'maxStars' },
+        { column: 'currentStars', alias: 'currentStars' },
         { column: 'isCompleted', alias: 'isCompleted' },
-        { column: 'isActive', alias: 'isActive' },
         { column: 'categoryId', alias: 'categoryId' },
-        { column: 'goalId', alias: 'goalId' },
         { column: 'createdAt', alias: 'createdAt' },
         { column: 'updatedAt', alias: 'updatedAt' }
       ]
@@ -102,37 +102,26 @@ export const deleteChallenge = async (id: number) => {
   }
 };
 
-// -------- Special updates --------
-export const updateChallengeProgress = async (id: number, progressValue: number) => {
+export const deleteHeart = async (id: number) => {
   try {
-    const challengesDB = await initializeTableFunctions(getDatabase, TABLE_NAME);
-    return await challengesDB.update(id, { progressValue }, isTimestamp);
+    const challenge = await findChallengeById(id);
+    if (!challenge) throw new Error(`Challenge with id ${id} not found`);
+    const newHearts = Math.max(0, (challenge.currentHearts || 0) - 1);
+    return await updateChallenge(id, { currentHearts: newHearts });
   } catch (error) {
-    console.error('[UPDATE_CHALLENGE_PROGRESS] Error:', error);
+    console.error('[DELETE_HEART] Error:', error);
     throw error;
   }
 };
 
-export const incrementChallengeProgress = async (id: number, amount: number = 1) => {
+export const addStar = async (id: number) => {
   try {
     const challenge = await findChallengeById(id);
     if (!challenge) throw new Error(`Challenge with id ${id} not found`);
-    const newProgress = (challenge.progressValue || 0) + amount;
-    return await updateChallengeProgress(id, newProgress);
+    const newStars = Math.min(challenge.maxStars || 0, (challenge.currentStars || 0) + 1);
+    return await updateChallenge(id, { currentStars: newStars });
   } catch (error) {
-    console.error('[INCREMENT_CHALLENGE_PROGRESS] Error:', error);
-    throw error;
-  }
-};
-
-export const decrementChallengeProgress = async (id: number, amount: number = 1) => {
-  try {
-    const challenge = await findChallengeById(id);
-    if (!challenge) throw new Error(`Challenge with id ${id} not found`);
-    const newProgress = Math.max(0, (challenge.progressValue || 0) - amount);
-    return await updateChallengeProgress(id, newProgress);
-  } catch (error) {
-    console.error('[DECREMENT_CHALLENGE_PROGRESS] Error:', error);
+    console.error('[ADD_STAR] Error:', error);
     throw error;
   }
 };
@@ -143,16 +132,6 @@ export const updateChallengeCompletedById = async (id: number, isCompleted: bool
     return await challengesDB.update(id, { isCompleted: booleanToNumber(isCompleted) }, isTimestamp);
   } catch (error) {
     console.error('[UPDATE_CHALLENGE_COMPLETED] Error:', error);
-    throw error;
-  }
-};
-
-export const updateChallengeActiveById = async (id: number, isActive: boolean) => {
-  try {
-    const challengesDB = await initializeTableFunctions(getDatabase, TABLE_NAME);
-    return await challengesDB.update(id, { isActive: booleanToNumber(isActive) }, isTimestamp);
-  } catch (error) {
-    console.error('[UPDATE_CHALLENGE_ACTIVE] Error:', error);
     throw error;
   }
 };

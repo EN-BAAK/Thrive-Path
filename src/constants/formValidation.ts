@@ -151,3 +151,33 @@ export const addEditHabitValidation = Yup.object().shape({
     .nullable()
     .typeError('Deadline must be a valid date'),
 });
+
+export const addEditChallengeValidation = Yup.object().shape({
+  title: Yup.string()
+    .required('Title is required')
+    .max(100, 'Title must be at most 100 characters'),
+
+  description: Yup.string()
+    .max(500, 'Description must be at most 500 characters')
+    .nullable(),
+
+  target: Yup.number()
+    .required('Target is required')
+    .min(1, 'Target must be at least 1'),
+
+  repeatInterval: Yup.mixed<RepeatInterval>()
+    .oneOf(
+      [RepeatInterval.DAILY, RepeatInterval.WEEKLY, RepeatInterval.MONTHLY, RepeatInterval.CUSTOM],
+      'Invalid repeat interval'
+    )
+    .required('Repeat interval is required'),
+
+  startDate: Yup.date()
+    .required('Start date is required')
+    .typeError('Start date must be a valid date'),
+
+  deadline: Yup.date()
+    .nullable()
+    .typeError('Deadline must be a valid date')
+    .min(Yup.ref('startDate'), 'Deadline must be after start date'),
+});

@@ -90,7 +90,7 @@ export type HabitFetchedQuery = HabitWithCategory & {
   goalCategoryColor?: string,
   habitCategoryName?: string,
   habitCategoryColor?: string
-  goalCategoryId?:string,
+  goalCategoryId?: string,
 };
 
 export type SafeHabit = Omit<Habit, 'id' | 'createdAt' | 'updatedAt'>;
@@ -99,17 +99,17 @@ export type Challenge = {
   id: number;
   title: string;
   description?: string;
-  goalPoints: number;
+  points: number;
   penaltyPoints: number;
   targetValue?: number;
-  progressValue: number;
   startDate: string;
   endDate: string;
-  linkedHabitId?: number;
+  maxHearts?: number;
+  currentHearts?: number;
+  maxStars?: number;
+  currentStars?: number;
   isCompleted: boolean;
-  isActive: boolean;
   categoryId?: number;
-  goalId?: number;
   createdAt: string;
   updatedAt: string;
 };

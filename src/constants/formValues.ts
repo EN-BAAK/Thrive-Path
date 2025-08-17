@@ -1,4 +1,4 @@
-import { Category, Goal, Habit, SafeSubtask, Task } from "../types/schemas";
+import { Category, Challenge, Goal, Habit, SafeSubtask, Task } from "../types/schemas";
 import { HabitType, RepeatInterval, Status } from "../types/variables";
 
 export const defaultGoal: Goal = {
@@ -57,4 +57,23 @@ export const defaultHabit: Habit = {
   goalId: undefined,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
+};
+
+export const defaultChallenge: Challenge = {
+  id: -1,
+  title: '',
+  description: '',
+  points: 0,
+  penaltyPoints: 0,
+  targetValue: 0,
+  maxHearts: 0,
+  maxStars: 0,
+  currentHearts: 0,
+  currentStars: 0,
+  startDate: new Date().toISOString(),
+  endDate: new Date().toISOString(),
+  categoryId: undefined,
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+  isCompleted: false
 };

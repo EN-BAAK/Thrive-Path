@@ -8,7 +8,7 @@ export const initializeDatabase = async () => {
   // await db.executeSql(`DROP TABLE IF EXISTS subtasks`)
   // await db.executeSql(`DROP TABLE IF EXISTS categories`)
   // await db.executeSql(`DROP TABLE IF EXISTS habits`)
-  // await db.executeSql(`DROP TABLE IF EXISTS challenges`)
+  await db.executeSql(`DROP TABLE IF EXISTS challenges`)
 
   await db.executeSql(`
     CREATE TABLE IF NOT EXISTS categories (
@@ -91,10 +91,9 @@ export const initializeDatabase = async () => {
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
     description TEXT,
-    goalPoints INTEGER DEFAULT 0,
+    points INTEGER DEFAULT 0,
     penaltyPoints INTEGER DEFAULT 0,
     targetValue INTEGER,
-    progressValue INTEGER DEFAULT 0,
     startDate TEXT NOT NULL,
     endDate TEXT NOT NULL,
     maxHearts INTEGER DEFAULT 0,
@@ -102,16 +101,12 @@ export const initializeDatabase = async () => {
     maxStars INTEGER DEFAULT 0,
     currentStars INTEGER DEFAULT 0,
     isCompleted INTEGER DEFAULT 0,
-    isActive INTEGER DEFAULT 1,
     categoryId INTEGER,
-    goalId INTEGER,
     createdAt TEXT DEFAULT (datetime('now')),
     updatedAt TEXT DEFAULT (datetime('now')),
-    FOREIGN KEY (categoryId) REFERENCES categories(id) ON DELETE SET NULL,
-    FOREIGN KEY (goalId) REFERENCES goals(id) ON DELETE SET NULL
+    FOREIGN KEY (categoryId) REFERENCES categories(id) ON DELETE SET NULL
   );
 `);
-
 
   await db.executeSql(`CREATE INDEX IF NOT EXISTS idx_goals_title ON goals(title);`);
   await db.executeSql(`CREATE INDEX IF NOT EXISTS idx_goals_priority ON goals(priority);`);
