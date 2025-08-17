@@ -8,7 +8,7 @@ export const initializeDatabase = async () => {
   // await db.executeSql(`DROP TABLE IF EXISTS subtasks`)
   // await db.executeSql(`DROP TABLE IF EXISTS categories`)
   // await db.executeSql(`DROP TABLE IF EXISTS habits`)
-  await db.executeSql(`DROP TABLE IF EXISTS challenges`)
+  // await db.executeSql(`DROP TABLE IF EXISTS challenges`)
 
   await db.executeSql(`
     CREATE TABLE IF NOT EXISTS categories (

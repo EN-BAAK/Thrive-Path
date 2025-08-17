@@ -161,23 +161,32 @@ export const addEditChallengeValidation = Yup.object().shape({
     .max(500, 'Description must be at most 500 characters')
     .nullable(),
 
-  target: Yup.number()
-    .required('Target is required')
-    .min(1, 'Target must be at least 1'),
+  points: Yup.number()
+    .required('Points are required')
+    .min(0, 'Points must be at least 0'),
 
-  repeatInterval: Yup.mixed<RepeatInterval>()
-    .oneOf(
-      [RepeatInterval.DAILY, RepeatInterval.WEEKLY, RepeatInterval.MONTHLY, RepeatInterval.CUSTOM],
-      'Invalid repeat interval'
-    )
-    .required('Repeat interval is required'),
+  penaltyPoints: Yup.number()
+    .required('Penalty points are required')
+    .min(0, 'Penalty points must be at least 0'),
+
+  targetValue: Yup.number()
+    .required('Target value is required')
+    .min(1, 'Target value must be at least 1'),
+
+  maxHearts: Yup.number()
+    .required('Max hearts are required')
+    .min(0, 'Max hearts must be at least 0'),
+
+  maxStars: Yup.number()
+    .required('Max stars are required')
+    .min(0, 'Max stars must be at least 0'),
 
   startDate: Yup.date()
     .required('Start date is required')
     .typeError('Start date must be a valid date'),
 
-  deadline: Yup.date()
+  endDate: Yup.date()
     .nullable()
-    .typeError('Deadline must be a valid date')
-    .min(Yup.ref('startDate'), 'Deadline must be after start date'),
+    .typeError('End date must be a valid date')
+    .min(Yup.ref('startDate'), 'End date must be after start date'),
 });

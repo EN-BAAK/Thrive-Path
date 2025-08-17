@@ -165,6 +165,9 @@ const layout: NamedStyles<any> = {
   flexRow: {
     flexDirection: "row"
   },
+  flexRowReversed: {
+    flexDirection: "row-reverse"
+  },
   flexColumn: {
     flexDirection: "column"
   },
@@ -173,6 +176,9 @@ const layout: NamedStyles<any> = {
   },
   dFlex: {
     display: "flex"
+  },
+  flexWrap: {
+    flexWrap: "wrap"
   },
   dNone: {
     display: "none"

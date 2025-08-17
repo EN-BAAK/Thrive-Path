@@ -8,10 +8,8 @@ import SelectField from '../forms/SelectField';
 import Button from '../forms/Button';
 import { createChallenge, updateChallenge } from '../../api/crud/challenges';
 import { getCategories } from '../../api/crud/categories';
-import { findGoalIdentities } from '../../api/crud/goals';
 import { Challenge, Category } from '../../types/schemas';
 import { AddEditChallengeModalProps } from '../../types/modals';
-import { IdentifyEntity, RepeatInterval } from '../../types/variables';
 import { addEditChallengeValidation } from '../../constants/formValidation';
 
 const { height: windowHeight } = Dimensions.get('window');
@@ -23,7 +21,6 @@ const AddEditChallengeModal: React.FC<AddEditChallengeModalProps> = ({
   initialChallenge,
 }) => {
   const [categories, setCategories] = useState<Category[]>([]);
-  const [goals, setGoals] = useState<IdentifyEntity[]>([]);
 
   const fetchCategories = async () => {
     try {
@@ -31,15 +28,6 @@ const AddEditChallengeModal: React.FC<AddEditChallengeModalProps> = ({
       setCategories(cats);
     } catch (error) {
       console.error('Error fetching categories:', error);
-    }
-  };
-
-  const fetchGoals = async () => {
-    try {
-      const data = await findGoalIdentities();
-      setGoals(data);
-    } catch (error) {
-      console.error('Error fetching goals:', error);
     }
   };
 
@@ -67,10 +55,8 @@ const AddEditChallengeModal: React.FC<AddEditChallengeModalProps> = ({
   };
 
   useEffect(() => {
-    if (visible) {
+    if (visible)
       fetchCategories();
-      fetchGoals();
-    }
   }, [visible]);
 
   return (
@@ -143,48 +129,52 @@ const AddEditChallengeModal: React.FC<AddEditChallengeModalProps> = ({
                         containerStyle={framework.mb3}
                       />
 
-                      <SelectField
-                        name="goalId"
-                        label="Goal"
-                        placeholder="Link to goal"
-                        options={goals.map((c) => ({
-                          label: c.name,
-                          value: c.id,
-                        }))}
-                        containerStyle={framework.mb3}
+                      <InputField
+                        name="points"
+                        label="Reward Points"
+                        required
+                        type="numeric"
+                        placeholder="e.g. 100"
                       />
 
                       <InputField
-                        name="target"
-                        label="Target"
+                        name="penaltyPoints"
+                        label="Penalty Points"
                         required
                         type="numeric"
-                        placeholder="E.g., 100 pages / 50 workouts"
-                        containerStyle={framework.mb2}
+                        placeholder="e.g. 50"
                       />
 
-                      <SelectField
-                        name="repeatInterval"
-                        label="Repeat Interval"
-                        options={[
-                          { label: 'Daily', value: RepeatInterval.DAILY },
-                          { label: 'Weekly', value: RepeatInterval.WEEKLY },
-                          { label: 'Monthly', value: RepeatInterval.MONTHLY },
-                          { label: 'Custom', value: RepeatInterval.CUSTOM },
-                        ]}
-                        containerStyle={framework.mb2}
+                      <InputField
+                        name="targetValue"
+                        label="Target Value"
+                        required
+                        type="numeric"
+                        placeholder="e.g. 20 workouts"
+                      />
+
+                      <InputField
+                        name="maxHearts"
+                        label="Max Hearts"
+                        required
+                        type="numeric"
+                      />
+
+                      <InputField
+                        name="maxStars"
+                        label="Max Stars"
+                        required
+                        type="numeric"
                       />
 
                       <DatePickerField
                         name="startDate"
                         label="Start Date"
-                        containerStyle={framework.mb2}
                       />
 
                       <DatePickerField
-                        name="deadline"
-                        label="Deadline"
-                        containerStyle={framework.mb2}
+                        name="endDate"
+                        label="End Date"
                       />
 
                       <View style={[framework.flexRow, framework.justifyEnd]}>

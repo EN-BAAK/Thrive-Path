@@ -75,5 +75,5 @@ export const defaultChallenge: Challenge = {
   categoryId: undefined,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
-  isCompleted: false
+  isCompleted: false,
 };
