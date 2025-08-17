@@ -29,9 +29,10 @@ export type NamedStyles<T> = { [P in keyof T]: ViewStyle | TextStyle };
 
 export type JoinInput = {
   through: string;
-  columns?: ColumnSelection[];
+  as?: string;
   on: string;
   type?: JoinTypes;
+  columns?: ColumnSelection[];
 };
 
 export type ColumnSelection = {
@@ -54,3 +55,8 @@ export type ThemeColors = {
 };
 
 export type ButtonVariant = 'main' | 'main-outline';
+
+export type IdentifyEntity = {
+  id: number,
+  name: string,
+}

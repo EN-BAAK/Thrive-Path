@@ -2,7 +2,7 @@ import { getDatabase } from '../db';
 import { Goal, GoalWCategory, SafetyGoal } from '../../types/schemas';
 import initializeTableFunctions from '../../misc/database';
 import { initializeDatabase } from '../schema';
-import { Condition, Status } from '../../types/variables';
+import { Condition, IdentifyEntity, Status } from '../../types/variables';
 import { booleanToNumber } from '../../misc/helpers';
 
 initializeDatabase();
@@ -56,6 +56,19 @@ export const findAllGoals = async (): Promise<GoalWCategory[]> => {
     throw error;
   }
 };
+
+export const findGoalIdentities = async (): Promise<IdentifyEntity[]> => {
+  const goalsDB = await initializeTableFunctions(getDatabase, TABLE_NAME);
+  return await goalsDB.findAll<IdentifyEntity>(
+    [],
+    "goals.createdAt DESC",
+    [],
+    [
+      { column: "id", alias: "id" },
+      { column: "name", alias: "name" }
+    ]
+  )
+}
 
 export const updateGoal = async (id: number, updates: Partial<Goal>) => {
   try {

@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 import { iconList } from '../misc/global';
-import { Status } from '../types/variables';
+import { HabitType, RepeatInterval, Status } from '../types/variables';
 
 export const addEditGoalValidation = Yup.object().shape({
   name: Yup.string()
@@ -79,4 +79,75 @@ export const addEditSubtaskValidation = Yup.object().shape({
   isImportant: Yup.boolean().required(),
 
   isCompleted: Yup.boolean().required(),
+});
+
+export const addEditHabitValidation = Yup.object().shape({
+  title: Yup.string()
+    .required('Title is required')
+    .max(100, 'Title must be at most 100 characters'),
+
+  description: Yup.string()
+    .max(500, 'Description must be at most 500 characters')
+    .nullable(),
+
+  habitType: Yup.mixed<HabitType>()
+    .oneOf([HabitType.GOOD, HabitType.BAD], 'Invalid type')
+    .required('Habit type is required'),
+
+  winPoints: Yup.number()
+    .required('Win points required')
+    .min(0, 'Win points must be ≥ 0')
+    .integer('Must be an integer'),
+
+  losePoints: Yup.number()
+    .required('Lose points required')
+    .min(0, 'Lose points must be ≥ 0')
+    .integer('Must be an integer'),
+
+  repeatInterval: Yup.mixed<RepeatInterval>()
+    .oneOf(
+      [RepeatInterval.DAILY, RepeatInterval.WEEKLY, RepeatInterval.MONTHLY, RepeatInterval.CUSTOM],
+      'Invalid repeat interval'
+    )
+    .required('Repeat interval is required'),
+
+  customIntervalDays: Yup.number()
+    .nullable()
+    .when('repeatInterval', {
+      is: RepeatInterval.CUSTOM,
+      then: (schema) =>
+        schema
+          .required('Custom interval days required')
+          .min(1, 'Must be at least 1 day')
+          .integer('Must be an integer'),
+      otherwise: (schema) => schema.nullable(),
+    }),
+
+  repeatWeekDay: Yup.number()
+    .nullable()
+    .when('repeatInterval', {
+      is: RepeatInterval.WEEKLY,
+      then: (schema) =>
+        schema
+          .required('Weekday is required')
+          .min(0, 'Invalid day')
+          .max(6, 'Invalid day'),
+      otherwise: (schema) => schema.nullable(),
+    }),
+
+  repeatMonthDay: Yup.number()
+    .nullable()
+    .when('repeatInterval', {
+      is: RepeatInterval.MONTHLY,
+      then: (schema) =>
+        schema
+          .required('Day of month required')
+          .min(1, 'Day must be between 1 and 31')
+          .max(31, 'Day must be between 1 and 31'),
+      otherwise: (schema) => schema.nullable(),
+    }),
+
+  deadline: Yup.date()
+    .nullable()
+    .typeError('Deadline must be a valid date'),
 });

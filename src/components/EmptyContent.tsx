@@ -27,6 +27,7 @@ const EmptyContent: React.FC<EmptyContentProps> = ({
         buttonText && onButtonPress && (
           <Button
             msg={buttonText}
+            onPress={onButtonPress}
           />
         )
       }

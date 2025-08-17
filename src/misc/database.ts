@@ -41,9 +41,10 @@ class DatabaseFunctions {
 
   private buildJoinClause(joins?: JoinInput[]): string {
     if (!joins?.length) return '';
-    return joins.map(
-      join => ` ${join.type ?? 'LEFT'} JOIN ${join.through} ON ${join.on}`
-    ).join('');
+    return joins.map(join => {
+      const tableName = join.as ? `${join.through} AS ${join.as}` : join.through;
+      return ` ${join.type ?? 'LEFT'} JOIN ${tableName} ON ${join.on}`;
+    }).join('');
   }
 
   private buildSelectClause(
@@ -64,12 +65,13 @@ class DatabaseFunctions {
 
     if (joins?.length) {
       for (const join of joins) {
+        const tableName = join.as ?? join.through;
         if (!join.columns?.length) {
-          selections.push(`${join.through}.*`);
+          selections.push(`${tableName}.*`);
         } else {
           selections.push(
             ...join.columns.map(
-              col => `${join.through}.${col.column} AS ${col.alias ?? `${join.through}_${col.column}`}`
+              col => `${tableName}.${col.column} AS ${col.alias ?? `${tableName}_${col.column}`}`
             )
           );
         }
@@ -93,9 +95,9 @@ class DatabaseFunctions {
       const values: any[] = [];
 
       if (conditions.length) {
-        const whereClause = conditions.map(
-          cond => `${cond.table ?? this.table}.${cond.field} ${cond.operator ?? '='} ?`
-        ).join(' AND ');
+        const whereClause = conditions
+          .map(cond => `${cond.table ?? this.table}.${cond.field} ${cond.operator ?? '='} ?`)
+          .join(' AND ');
         query += ` WHERE ${whereClause}`;
         values.push(...conditions.map(cond => cond.value));
       }
@@ -104,7 +106,6 @@ class DatabaseFunctions {
 
       const [results] = await this.db.executeSql(query, values);
       const data: T[] = [];
-
       for (let i = 0; i < results.rows.length; i++) {
         data.push(results.rows.item(i));
       }
@@ -129,9 +130,9 @@ class DatabaseFunctions {
       const values: any[] = [];
 
       if (conditions.length) {
-        const whereClause = conditions.map(
-          cond => `${cond.table ?? this.table}.${cond.field} ${cond.operator ?? '='} ?`
-        ).join(' AND ');
+        const whereClause = conditions
+          .map(cond => `${cond.table ?? this.table}.${cond.field} ${cond.operator ?? '='} ?`)
+          .join(' AND ');
         query += ` WHERE ${whereClause}`;
         values.push(...conditions.map(cond => cond.value));
       }
@@ -151,7 +152,6 @@ class DatabaseFunctions {
   async findByPk<T>(id: number): Promise<T | null> {
     return this.findOne<T>([{ field: 'id', value: id }]);
   }
-
 
   async update(id: number, updates: Partial<any>, isTimestamp = true) {
     try {

@@ -70,16 +70,27 @@ export type Habit = {
   losePoints: number;
   repeatInterval?: RepeatInterval;
   customIntervalDays?: number;
-  maxHearts: number;
-  currentHearts: number;
-  maxStars: number;
-  currentStars: number;
+  repeatWeekDay?: number,
+  repeatMonthDay?: number,
   deadline?: string;
-  isActive: boolean;
   categoryId?: number;
   goalId?: number;
   createdAt: string;
   updatedAt: string;
+};
+
+export type HabitWithCategory = Habit & {
+  categoryName?: string,
+  categoryColor?: string;
+  goalName?: string,
+}
+
+export type HabitFetchedQuery = HabitWithCategory & {
+  goalCategoryName?: string,
+  goalCategoryColor?: string,
+  habitCategoryName?: string,
+  habitCategoryColor?: string
+  goalCategoryId?:string,
 };
 
 export type SafeHabit = Omit<Habit, 'id' | 'createdAt' | 'updatedAt'>;

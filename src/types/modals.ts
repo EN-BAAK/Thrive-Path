@@ -1,4 +1,4 @@
-import { Category, Goal, Task } from "./schemas";
+import { Category, Goal, Habit, Task } from "./schemas";
 
 export type Modal = {
   visible: boolean,
@@ -20,4 +20,8 @@ export type AddEditTaskModalProps = {
 
 export type AddSubtaskModalProps = {
   parentTaskId: number;
+} & Modal;
+
+export type AddEditHabitModalProps = {
+  initialHabit: Habit;
 } & Modal;

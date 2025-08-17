@@ -23,7 +23,7 @@ type FieldProps = {
   placeholder?: string,
   containerStyle?: ViewStyle,
   labelStyle?: ViewStyle,
-  required?: boolean
+  required?: boolean,
 }
 
 export interface InputFieldProps extends FieldProps {
@@ -44,6 +44,7 @@ export interface DatePickerFieldProps extends FieldProps { }
 export interface SelectFieldProps extends FieldProps {
   options: SelectOption[];
   pickerStyle?: any;
+  disabled?: boolean
 }
 
 export interface ColorPickerFieldProps extends FieldProps { }

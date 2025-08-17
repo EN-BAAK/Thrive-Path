@@ -16,6 +16,7 @@ const SelectField: React.FC<SelectFieldProps> = ({
   labelStyle,
   pickerStyle,
   required = false,
+  disabled = false
 }) => {
   return (
     <View style={[containerStyle]}>
@@ -37,13 +38,14 @@ const SelectField: React.FC<SelectFieldProps> = ({
       <Field name={name}>
         {({ field, form, meta }: any) => (
           <>
-            <View style={[framework.input, framework.py0, pickerStyle]}>
+            <View style={[framework.input, framework.py0, pickerStyle, disabled && framework.bgLayout]}>
               <Picker
                 selectedValue={field.value}
                 onValueChange={(value) => form.setFieldValue(name, value)}
                 style={{ color: colors.dark }}
+                enabled={!disabled}
               >
-                <Picker.Item label={placeholder} value={undefined} color={colors.gray} />
+                <Picker.Item label={placeholder} value={null} color={colors.gray} />
                 {options.map((option) => (
                   <Picker.Item
                     key={option.value}
