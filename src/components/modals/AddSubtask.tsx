@@ -12,6 +12,7 @@ import { defaultSubtask } from '../../constants/formValues';
 import { createSubtask } from '../../api/crud/tasks';
 import { AddSubtaskModalProps } from '../../types/modals';
 import Button from '../forms/Button';
+import { ScrollView } from 'react-native';
 
 const AddSubtaskModal: React.FC<AddSubtaskModalProps> = ({ visible, onClose, onSave, parentTaskId, }) => {
   const handleSubmitSubtask = async (values: SafeSubtask) => {
@@ -42,57 +43,59 @@ const AddSubtaskModal: React.FC<AddSubtaskModalProps> = ({ visible, onClose, onS
                 Add Subtask
               </Text>
 
-              <Formik<SafeSubtask>
-                initialValues={defaultSubtask}
-                validationSchema={addEditSubtaskValidation}
-                onSubmit={handleSubmitSubtask}
-                enableReinitialize
-              >
-                {(formik) => (
-                  <>
-                    <InputField
-                      name="title"
-                      label="Title"
-                      required
-                      placeholder="Enter subtask title"
-                      containerStyle={framework.mb2}
-                    />
-
-                    <InputField
-                      name="points"
-                      label="Points"
-                      placeholder="Enter points"
-                      type="numeric"
-                      containerStyle={framework.mb2}
-                    />
-
-                    <SwitchField
-                      name="isImportant"
-                      label="Important?"
-                      containerStyle={framework.mb2}
-                      trackColor={{ true: Variables.lightMain, false: Variables.secondaryColor }}
-                      thumbColor={{ true: Variables.mainColor, false: colors.gray }}
-                    />
-
-                    <SwitchField
-                      name="isCompleted"
-                      label="Completed?"
-                      containerStyle={framework.mb3}
-                      trackColor={{ true: colors.success, false: Variables.secondaryColor }}
-                      thumbColor={{ true: colors.success, false: colors.gray }}
-                    />
-
-                    <View style={[framework.flexRow, framework.justifyEnd]}>
-                      <Button
-                        msg='Save'
-                        onPress={() => formik.handleSubmit()}
-                        style={[framework.px5, framework.rounded]}
-                        disabled={!formik.dirty || formik.isSubmitting || !formik.isValid}
+              <ScrollView showsVerticalScrollIndicator={false}>
+                <Formik<SafeSubtask>
+                  initialValues={defaultSubtask}
+                  validationSchema={addEditSubtaskValidation}
+                  onSubmit={handleSubmitSubtask}
+                  enableReinitialize
+                >
+                  {(formik) => (
+                    <>
+                      <InputField
+                        name="title"
+                        label="Title"
+                        required
+                        placeholder="Enter subtask title"
+                        containerStyle={framework.mb2}
                       />
-                    </View>
-                  </>
-                )}
-              </Formik>
+
+                      <InputField
+                        name="points"
+                        label="Points"
+                        placeholder="Enter points"
+                        type="numeric"
+                        containerStyle={framework.mb2}
+                      />
+
+                      <SwitchField
+                        name="isImportant"
+                        label="Important?"
+                        containerStyle={framework.mb2}
+                        trackColor={{ true: Variables.lightMain, false: Variables.secondaryColor }}
+                        thumbColor={{ true: Variables.mainColor, false: colors.gray }}
+                      />
+
+                      <SwitchField
+                        name="isCompleted"
+                        label="Completed?"
+                        containerStyle={framework.mb3}
+                        trackColor={{ true: colors.success, false: Variables.secondaryColor }}
+                        thumbColor={{ true: colors.success, false: colors.gray }}
+                      />
+
+                      <View style={[framework.flexRow, framework.justifyEnd]}>
+                        <Button
+                          msg='Save'
+                          onPress={() => formik.handleSubmit()}
+                          style={[framework.px5, framework.rounded]}
+                          disabled={!formik.dirty || formik.isSubmitting || !formik.isValid}
+                        />
+                      </View>
+                    </>
+                  )}
+                </Formik>
+              </ScrollView>
             </View>
           </TouchableWithoutFeedback>
         </KeyboardAvoidingView>

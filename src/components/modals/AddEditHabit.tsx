@@ -83,35 +83,12 @@ const AddEditHabitModal: React.FC<AddEditHabitModalProps> = ({
       >
         <KeyboardAvoidingView behavior="height" style={[framework.w100, framework.justifyCenter]}>
           <TouchableWithoutFeedback>
-            <View
-              style={[
-                styles.form,
-                framework.bgBackground,
-                framework.p4,
-                framework.roundedMd,
-                framework.shadowMedium,
-              ]}
-            >
-              <Text
-                style={[
-                  framework.bgMain,
-                  framework.mb4,
-                  framework.py2,
-                  framework.px4,
-                  framework.roundedBottomMd,
-                  framework.textCenter,
-                  framework.fontBold,
-                  framework.textXl,
-                  framework.reversedText,
-                ]}
-              >
+            <View style={[styles.form, framework.bgBackground, framework.p4, framework.roundedMd, framework.shadowMedium]} >
+              <Text style={[framework.bgMain, framework.mb4, framework.py2, framework.px4, framework.roundedBottomMd, framework.textCenter, framework.fontBold, framework.textXl, framework.reversedText]} >
                 {initialHabit?.id === -1 ? 'Add New Habit' : 'Edit Habit'}
               </Text>
 
-              <ScrollView
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={framework.mb5}
-              >
+              <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={framework.mb5}>
                 <Formik<Habit>
                   initialValues={initialHabit}
                   validationSchema={addEditHabitValidation}

@@ -146,13 +146,13 @@ const ChallengeCard: React.FC<CardProps<Challenge>> = ({ record: challenge, onEd
 
         <View style={[framework.flexRow, framework.gap3]}>
           {challenge.maxHearts && challenge.maxHearts > 0 && (
-            <TouchableOpacity onPress={loseHeart} style={[framework.bgDanger, framework.px3, framework.py1, framework.rounded]}>
-              <Text style={[framework.textWhite, framework.textSm]}>Lose Heart</Text>
+            <TouchableOpacity onPress={loseHeart} style={[framework.bgDanger, framework.px3, framework.py1, framework.flexOne, framework.rounded]}>
+              <Text style={[framework.textCenter, framework.textSm, framework.reversedText]}>Lose Heart</Text>
             </TouchableOpacity>
           )}
           {challenge.maxStars && challenge.maxStars > 0 && (
-            <TouchableOpacity onPress={increaseStars} style={[framework.bgSuccess, framework.px3, framework.py1, framework.rounded]}>
-              <Text style={[framework.textWhite, framework.textSm]}>Add Star</Text>
+            <TouchableOpacity onPress={increaseStars} style={[framework.bgSuccess, framework.px3, framework.py1, framework.flexOne, framework.rounded]}>
+              <Text style={[framework.textCenter, framework.textSm, framework.reversedText]}>Add Star</Text>
             </TouchableOpacity>
           )}
         </View>

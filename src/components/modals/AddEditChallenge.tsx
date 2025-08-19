@@ -68,28 +68,8 @@ const AddEditChallengeModal: React.FC<AddEditChallengeModalProps> = ({
       >
         <KeyboardAvoidingView behavior="height" style={[framework.w100, framework.justifyCenter]}>
           <TouchableWithoutFeedback>
-            <View
-              style={[
-                styles.form,
-                framework.bgBackground,
-                framework.p4,
-                framework.roundedMd,
-                framework.shadowMedium,
-              ]}
-            >
-              <Text
-                style={[
-                  framework.bgMain,
-                  framework.mb4,
-                  framework.py2,
-                  framework.px4,
-                  framework.roundedBottomMd,
-                  framework.textCenter,
-                  framework.fontBold,
-                  framework.textXl,
-                  framework.reversedText,
-                ]}
-              >
+            <View style={[styles.form, framework.bgBackground, framework.p4, framework.roundedMd, framework.shadowMedium]}>
+              <Text style={[framework.bgMain, framework.mb4, framework.py2, framework.px4, framework.roundedBottomMd, framework.textCenter, framework.fontBold, framework.textXl, framework.reversedText]}>
                 {initialChallenge?.id === -1 ? 'Add New Challenge' : 'Edit Challenge'}
               </Text>
 
@@ -177,7 +157,7 @@ const AddEditChallengeModal: React.FC<AddEditChallengeModalProps> = ({
                         label="End Date"
                       />
 
-                      <View style={[framework.flexRow, framework.justifyEnd]}>
+                      <View style={[framework.mt2, framework.flexRow, framework.justifyEnd]}>
                         <Button
                           msg="Save"
                           onPress={() => formik.handleSubmit()}

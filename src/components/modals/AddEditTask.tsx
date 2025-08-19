@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   KeyboardAvoidingView,
+  ScrollView,
 } from 'react-native';
 import { Formik } from 'formik';
 import framework from '../../styles/framework';
@@ -74,7 +75,7 @@ const AddEditTaskModal: React.FC<AddEditTaskModalProps> = ({
         style={[framework.bgLayout, framework.flexOne, framework.justifyCenter, framework.px3]}
         onPress={onClose}
       >
-        <KeyboardAvoidingView behavior="height" style={framework.w100} keyboardVerticalOffset={0}>
+        <KeyboardAvoidingView behavior="height" style={[framework.w100, framework.justifyCenter]} keyboardVerticalOffset={0}>
           <TouchableWithoutFeedback>
             <View style={[framework.bgBackground, framework.p4, framework.roundedMd, framework.shadowMedium]}>
               <Text style={[framework.bgMain, framework.mb4, framework.py2, framework.px4, framework.roundedBottomMd, framework.textCenter, framework.fontBold, framework.textXl, framework.reversedText]}
@@ -82,76 +83,78 @@ const AddEditTaskModal: React.FC<AddEditTaskModalProps> = ({
                 {initialTask?.id === -1 ? 'Add New Task' : 'Edit Task'}
               </Text>
 
-              <Formik<SafeTask>
-                initialValues={initialTask}
-                validationSchema={addEditTaskValidation}
-                onSubmit={handleSubmitTask}
-                enableReinitialize
-              >
-                {(formik) => (
-                  <>
-                    <InputField
-                      name="title"
-                      label="Title"
-                      required
-                      placeholder="Enter task title"
-                      containerStyle={framework.mb2}
-                    />
-
-                    <InputField
-                      name="description"
-                      label="Description"
-                      placeholder="Enter task description"
-                      containerStyle={framework.mb2}
-                      multiLine
-                    />
-
-                    <SwitchField
-                      name="isImportant"
-                      label="Important?"
-                      containerStyle={framework.mb2}
-                      trackColor={{ true: Variables.lightMain, false: Variables.secondaryColor }}
-                      thumbColor={{ true: Variables.mainColor, false: colors.gray }}
-                    />
-
-                    <InputField
-                      name="points"
-                      label="Points"
-                      placeholder="Enter points"
-                      type="numeric"
-                      containerStyle={framework.mb2}
-                    />
-
-                    <SwitchField
-                      name="isCompleted"
-                      label="Completed?"
-                      containerStyle={framework.mb2}
-                      trackColor={{ true: colors.success, false: Variables.secondaryColor }}
-                      thumbColor={{ true: colors.success, false: colors.gray }}
-                    />
-
-                    <SelectField
-                      name="categoryId"
-                      label="Category"
-                      placeholder="Select a category"
-                      options={categories.map(c => ({
-                        label: c.name,
-                        value: c.id,
-                      }))}
-                      containerStyle={framework.mb3}
-                    />
-
-                    <View style={[framework.flexRow, framework.justifyEnd]}>
-                      <Button
-                        msg='Save'
-                        onPress={() => formik.handleSubmit()}
-                        style={[framework.px5, framework.rounded]}
-                        disabled={!formik.dirty || formik.isSubmitting || !formik.isValid}
+              <ScrollView showsVerticalScrollIndicator={false}>
+                <Formik<SafeTask>
+                  initialValues={initialTask}
+                  validationSchema={addEditTaskValidation}
+                  onSubmit={handleSubmitTask}
+                  enableReinitialize
+                >
+                  {(formik) => (
+                    <>
+                      <InputField
+                        name="title"
+                        label="Title"
+                        required
+                        placeholder="Enter task title"
+                        containerStyle={framework.mb2}
                       />
-                    </View>
-                  </>
-                )}
-              </Formik>
+
+                      <InputField
+                        name="description"
+                        label="Description"
+                        placeholder="Enter task description"
+                        containerStyle={framework.mb2}
+                        multiLine
+                      />
+
+                      <SwitchField
+                        name="isImportant"
+                        label="Important?"
+                        containerStyle={framework.mb2}
+                        trackColor={{ true: Variables.lightMain, false: Variables.secondaryColor }}
+                        thumbColor={{ true: Variables.mainColor, false: colors.gray }}
+                      />
+
+                      <InputField
+                        name="points"
+                        label="Points"
+                        placeholder="Enter points"
+                        type="numeric"
+                        containerStyle={framework.mb2}
+                      />
+
+                      <SwitchField
+                        name="isCompleted"
+                        label="Completed?"
+                        containerStyle={framework.mb2}
+                        trackColor={{ true: colors.success, false: Variables.secondaryColor }}
+                        thumbColor={{ true: colors.success, false: colors.gray }}
+                      />
+
+                      <SelectField
+                        name="categoryId"
+                        label="Category"
+                        placeholder="Select a category"
+                        options={categories.map(c => ({
+                          label: c.name,
+                          value: c.id,
+                        }))}
+                        containerStyle={framework.mb3}
+                      />
+
+                      <View style={[framework.flexRow, framework.justifyEnd]}>
+                        <Button
+                          msg='Save'
+                          onPress={() => formik.handleSubmit()}
+                          style={[framework.px5, framework.rounded]}
+                          disabled={!formik.dirty || formik.isSubmitting || !formik.isValid}
+                        />
+                      </View>
+                    </>
+                  )}
+                </Formik>
+              </ScrollView>
             </View>
           </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
