@@ -3,3 +3,11 @@ export type CardProps<T> = {
   onSuccess?: () => void,
   onEdit?: () => void,
 }
+
+export type SessionCardProps = {
+  title: string;
+  description: string;
+  icon: string;
+  colors: [string, string];
+  navigateTo: string;
+};
