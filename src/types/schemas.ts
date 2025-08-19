@@ -115,3 +115,12 @@ export type Challenge = {
 };
 
 export type SafeChallenge = Omit<Challenge, 'id' | 'createdAt' | 'updatedAt'>;
+
+export type TimerLog = {
+  id: number;
+  duration: string;
+  type: string;
+  description?: string;
+};
+
+export type SafeTimerLog = Omit<TimerLog, 'id'>;

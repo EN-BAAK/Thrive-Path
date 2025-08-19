@@ -3,12 +3,22 @@ import { getDatabase } from './db';
 export const initializeDatabase = async () => {
   const db = await getDatabase();
 
-  // await db.executeSql(`DROP TABLE IF EXISTS goals`)
-  // await db.executeSql(`DROP TABLE IF EXISTS tasks`)
-  // await db.executeSql(`DROP TABLE IF EXISTS subtasks`)
-  // await db.executeSql(`DROP TABLE IF EXISTS categories`)
-  // await db.executeSql(`DROP TABLE IF EXISTS habits`)
-  // await db.executeSql(`DROP TABLE IF EXISTS challenges`)
+  await db.executeSql(`DROP INDEX IF EXISTS idx_goals_title;`);
+  await db.executeSql(`DROP INDEX IF EXISTS idx_goals_priority;`);
+  await db.executeSql(`DROP INDEX IF EXISTS idx_categories_name;`);
+  await db.executeSql(`DROP INDEX IF EXISTS idx_tasks_title;`);
+  await db.executeSql(`DROP INDEX IF EXISTS idx_subtasks_title;`);
+  await db.executeSql(`DROP INDEX IF EXISTS idx_habits_title;`);
+  await db.executeSql(`DROP INDEX IF EXISTS idx_challenges_title;`);
+  await db.executeSql(`DROP INDEX IF EXISTS idx_timer_logs_type;`);
+
+  await db.executeSql(`DROP TABLE IF EXISTS goals;`);
+  await db.executeSql(`DROP TABLE IF EXISTS tasks;`);
+  await db.executeSql(`DROP TABLE IF EXISTS subtasks;`);
+  await db.executeSql(`DROP TABLE IF EXISTS categories;`);
+  await db.executeSql(`DROP TABLE IF EXISTS habits;`);
+  await db.executeSql(`DROP TABLE IF EXISTS challenges;`);
+  await db.executeSql(`DROP TABLE IF EXISTS timer_logs;`);
 
   await db.executeSql(`
     CREATE TABLE IF NOT EXISTS categories (
@@ -108,6 +118,15 @@ export const initializeDatabase = async () => {
   );
 `);
 
+  await db.executeSql(`
+    CREATE TABLE IF NOT EXISTS timer_logs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      duration TEXT NOT NULL,
+      type TEXT NOT NULL,
+      description TEXT
+    );
+  `);
+
   await db.executeSql(`CREATE INDEX IF NOT EXISTS idx_goals_title ON goals(title);`);
   await db.executeSql(`CREATE INDEX IF NOT EXISTS idx_goals_priority ON goals(priority);`);
 
@@ -119,6 +138,8 @@ export const initializeDatabase = async () => {
   await db.executeSql(`CREATE INDEX IF NOT EXISTS idx_habits_title ON habits(title);`);
 
   await db.executeSql(`CREATE INDEX IF NOT EXISTS idx_challenges_title ON challenges(title);`);
+
+  await db.executeSql(`CREATE INDEX IF NOT EXISTS idx_timer_logs_type ON timer_logs(type);`);
 
   return db;
 };
