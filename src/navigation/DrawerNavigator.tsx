@@ -7,7 +7,7 @@ import framework from '../styles/framework';
 import Tasks from '../pages/Tasks';
 import Habits from '../pages/Habits';
 import Challenges from '../pages/Challenges';
-import Sessions from '../pages/Sessions';
+import SessionsStack from './SessionsStack';
 
 const Drawer = createDrawerNavigator();
 
@@ -27,7 +27,7 @@ const DrawerNavigator = () => {
       <Drawer.Screen name="Tasks" component={Tasks} />
       <Drawer.Screen name="Habits" component={Habits} />
       <Drawer.Screen name="Challenges" component={Challenges} />
-      <Drawer.Screen name="Sessions" component={Sessions} />
+      <Drawer.Screen name="Sessions" component={SessionsStack} />
     </Drawer.Navigator>
   );
 };

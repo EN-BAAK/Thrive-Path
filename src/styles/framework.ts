@@ -5,7 +5,9 @@ import Variables from './variables';
 
 const sizes: NamedStyles<any> = {
   h100: { height: "100%" },
-  w100: { width: "100%" }
+  w100: { width: "100%" },
+  w75: { width: "75%" },
+  w50: { width: "50%" },
 }
 
 const backgrounds: NamedStyles<any> = {

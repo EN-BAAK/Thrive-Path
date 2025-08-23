@@ -38,3 +38,18 @@ export const omit = <T extends object, K extends keyof T>(obj: T, keys: K[]): Om
   keys.forEach(key => delete clone[key]);
   return clone;
 }
+
+export const zeroPad = (n: number, padsNumber: number, padValue: string) => String(n).padStart(padsNumber, padValue)
+
+export const msToHMS = (ms: number) => {
+  const sec = Math.floor(ms / 1000);
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = sec % 60;
+  return { h, m, s };
+};
+
+export const formatHMS = (ms: number) => {
+  const { h, m, s } = msToHMS(ms);
+  return `${zeroPad(h, 2, "0")}:${zeroPad(m, 2, "0")}:${zeroPad(s, 2, "0")}`;
+};

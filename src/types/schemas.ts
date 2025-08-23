@@ -121,6 +121,7 @@ export type TimerLog = {
   duration: string;
   type: string;
   description?: string;
+  points: number
 };
 
 export type SafeTimerLog = Omit<TimerLog, 'id'>;

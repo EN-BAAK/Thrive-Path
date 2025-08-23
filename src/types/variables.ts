@@ -60,3 +60,8 @@ export type IdentifyEntity = {
   id: number,
   name: string,
 }
+
+export type TaskData = {
+  endAt: number;
+  onTick?: (msLeft: number) => void;
+};
