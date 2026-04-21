@@ -13,10 +13,6 @@ export const addEditGoalValidation = Yup.object().shape({
 
   isImportant: Yup.boolean(),
 
-  points: Yup.number()
-    .positive('Points must be positive')
-    .integer('Points must be an integer'),
-
   deadline: Yup.date()
     .required('Deadline is required')
     .typeError('Deadline must be a valid date'),
@@ -53,10 +49,6 @@ export const addEditTaskValidation = Yup.object().shape({
     .max(500, 'Description must be less than 500 characters')
     .nullable(),
 
-  points: Yup.number()
-    .positive('Points must be positive')
-    .integer('Points must be an integer'),
-
   isImportant: Yup.boolean().required(),
 
   isCompleted: Yup.boolean().required(),
@@ -71,10 +63,6 @@ export const addEditSubtaskValidation = Yup.object().shape({
     .required('Title is required')
     .min(2, 'Title must be at least 2 characters')
     .max(100, 'Title must be less than 100 characters'),
-
-  points: Yup.number()
-    .positive('Points must be positive')
-    .integer('Points must be an integer'),
 
   isImportant: Yup.boolean().required(),
 
@@ -93,16 +81,6 @@ export const addEditHabitValidation = Yup.object().shape({
   habitType: Yup.mixed<HabitType>()
     .oneOf([HabitType.GOOD, HabitType.BAD], 'Invalid type')
     .required('Habit type is required'),
-
-  winPoints: Yup.number()
-    .required('Win points required')
-    .min(0, 'Win points must be ≥ 0')
-    .integer('Must be an integer'),
-
-  losePoints: Yup.number()
-    .required('Lose points required')
-    .min(0, 'Lose points must be ≥ 0')
-    .integer('Must be an integer'),
 
   repeatInterval: Yup.mixed<RepeatInterval>()
     .oneOf(
@@ -160,14 +138,6 @@ export const addEditChallengeValidation = Yup.object().shape({
   description: Yup.string()
     .max(500, 'Description must be at most 500 characters')
     .nullable(),
-
-  points: Yup.number()
-    .required('Points are required')
-    .min(0, 'Points must be at least 0'),
-
-  penaltyPoints: Yup.number()
-    .required('Penalty points are required')
-    .min(0, 'Penalty points must be at least 0'),
 
   targetValue: Yup.number()
     .required('Target value is required')

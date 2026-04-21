@@ -1,7 +1,16 @@
-import SQLite from 'react-native-sqlite-storage';
+import { open, QuickSQLiteConnection } from 'react-native-quick-sqlite';
 
-SQLite.enablePromise(true);
+let databaseInstance: QuickSQLiteConnection | null = null;
 
 export const getDatabase = async () => {
-  return SQLite.openDatabase({ name: 'thrivePath.db', location: 'default' });
+  if (databaseInstance) return databaseInstance;
+
+  databaseInstance = open({
+    name: 'thrivePath.db',
+    location: "default"
+  });
+
+  await databaseInstance.executeAsync(`PRAGMA foreign_keys = ON;`);
+
+  return databaseInstance;
 };

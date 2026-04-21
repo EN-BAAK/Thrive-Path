@@ -451,6 +451,9 @@ const positions: NamedStyles<any> = {
   left5: { left: 20 },
 
   indexBehind: { zIndex: -1 },
+  index1: { zIndex: 1 },
+  index2: { zIndex: 2 },
+  index3: { zIndex: 3 },
   indexTop: { zIndex: 1001 },
 }
 
@@ -462,6 +465,7 @@ const components: NamedStyles<any> = {
     paddingVertical: 10,
     paddingHorizontal: 14,
     fontSize: 16,
+    color: colors.text,
   },
   textArea: {
     height: 80,

@@ -11,7 +11,7 @@ const EmptyContent: React.FC<EmptyContentProps> = ({
   onButtonPress,
 }) => {
   return (
-    <View style={[framework.flexOne, framework.py5, framework.flexCenter]}>
+    <View style={[framework.bgBackground, framework.flexOne, framework.py5, framework.flexCenter]}>
       <Text style={[framework.textCapitalize, framework.textCenter, framework.fontSemiBold, framework.textLg, framework.textMain,]}
       >
         {message}

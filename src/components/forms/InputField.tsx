@@ -22,7 +22,7 @@ const InputField: React.FC<InputFieldProps> = ({
   return (
     <View style={[containerStyle]}>
       {label &&
-        <Text style={[framework.mb1, framework.fontSemiBold, framework.textSm, framework.dark, labelStyle]}>
+        <Text style={[framework.mb1, framework.fontSemiBold, framework.textSm, framework.text, labelStyle]}>
           {label}
           {required && " *"}
         </Text>}
@@ -32,7 +32,7 @@ const InputField: React.FC<InputFieldProps> = ({
           <>
             <TextInput
               placeholder={placeholder}
-              placeholderTextColor={colors.gray}
+              placeholderTextColor={colors.dark}
               style={[framework.input, multiLine && framework.textArea, inputStyle]}
               keyboardType={type}
               secureTextEntry={secureTextEntry}

@@ -26,7 +26,7 @@ const SelectField: React.FC<SelectFieldProps> = ({
             framework.mb1,
             framework.fontSemiBold,
             framework.textSm,
-            framework.dark,
+            framework.text,
             labelStyle,
           ]}
         >

@@ -84,10 +84,10 @@ const GoalCard: React.FC<CardProps<GoalWCategory>> = ({ record: goal, onEdit, on
             {menuVisible && (
               <View style={[framework.bgLight, framework.rounded, framework.shadowLight, framework.absolute, framework.top0, framework.right4, framework.overflowHidden]}>
                 <TouchableOpacity onPress={onEdit} style={[styles.menuItem, framework.py2, framework.px4]}>
-                  <Text>Edit</Text>
+                  <Text style={[framework.text]}>Edit</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={handleDelete} style={[styles.menuItem, framework.py2, framework.px4]}>
-                  <Text>Delete</Text>
+                  <Text style={[framework.text]}>Delete</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -97,42 +97,6 @@ const GoalCard: React.FC<CardProps<GoalWCategory>> = ({ record: goal, onEdit, on
         <Text style={[framework.mt1, framework.textSm, framework.reversedText]}>
           {goal.categoryName}
         </Text>
-
-        {goal.status && (
-          <TouchableOpacity
-            onPress={() => setStatusMenuVisible(true)}
-            style={[styles.statusBadge, framework.mt2, framework.px3, framework.roundedPill, { backgroundColor: statusColor }]}
-          >
-            <Text style={[framework.textXs, framework.reversedText]}>{goal.status}</Text>
-          </TouchableOpacity>
-        )}
-
-        <Modal
-          visible={statusMenuVisible}
-          transparent
-          animationType="fade"
-          onRequestClose={() => setStatusMenuVisible(false)}
-        >
-          <TouchableOpacity
-            style={[framework.bgLayout, framework.flexOne, framework.flexCenter]}
-            activeOpacity={1}
-            onPressOut={() => setStatusMenuVisible(false)}
-          >
-            <View style={[styles.statusMenu, framework.bgBackground, framework.py2, framework.rounded, framework.shadowStrong]}>
-              {statusList.map((status) => (
-                <TouchableOpacity
-                  key={status}
-                  style={[framework.py3, framework.px5, status === goal.status && framework.bgLightMain]}
-                  onPress={() => handleChangeStatus(status)}
-                >
-                  <Text style={status === goal.status && framework.textMain}>
-                    {status}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </TouchableOpacity>
-        </Modal>
       </LinearGradient>
 
       <View style={[framework.p3, framework.pt2]}>
@@ -141,20 +105,48 @@ const GoalCard: React.FC<CardProps<GoalWCategory>> = ({ record: goal, onEdit, on
         )}
 
         <View style={[framework.flexRow, framework.justifyBetween]}>
-          <View style={[framework.bgWarning, framework.py1, framework.px3, framework.flexRow, framework.alignCenter, framework.gap2, framework.roundedPill]}>
-            <FontAwesome5 name="star" size={14} color={Variables.reversedTextColor} />
-
-            <Text style={[framework.fontBold, framework.textSm, framework.reversedText]}>
-              {goal.points} pts
-            </Text>
-          </View>
-
           <View style={[framework.bgInfo, framework.py1, framework.px3, framework.flexRow, framework.alignCenter, framework.gap2, framework.roundedPill]}>
             <FontAwesome5 name="clock" size={14} color={Variables.reversedTextColor} />
             <Text style={[framework.textSm, framework.fontBold, framework.reversedText]}>
               {formatDate(goal.deadline)}
             </Text>
           </View>
+
+          {goal.status && (
+            <TouchableOpacity
+              onPress={() => setStatusMenuVisible(true)}
+              style={[styles.statusBadge, framework.py1, framework.px3, framework.roundedPill, { backgroundColor: statusColor }]}
+            >
+              <Text style={[framework.textSm, framework.reversedText]}>{goal.status}</Text>
+            </TouchableOpacity>
+          )}
+
+          <Modal
+            visible={statusMenuVisible}
+            transparent
+            animationType="fade"
+            onRequestClose={() => setStatusMenuVisible(false)}
+          >
+            <TouchableOpacity
+              style={[framework.bgLayout, framework.flexOne, framework.flexCenter]}
+              activeOpacity={1}
+              onPressOut={() => setStatusMenuVisible(false)}
+            >
+              <View style={[styles.statusMenu, framework.bgBackground, framework.py2, framework.rounded, framework.shadowStrong]}>
+                {statusList.map((status) => (
+                  <TouchableOpacity
+                    key={status}
+                    style={[framework.py3, framework.px5, status === goal.status && framework.bgLightMain]}
+                    onPress={() => handleChangeStatus(status)}
+                  >
+                    <Text style={[framework.text]}>
+                      {status}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </TouchableOpacity>
+          </Modal>
         </View>
       </View>
 

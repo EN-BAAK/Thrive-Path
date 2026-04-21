@@ -30,7 +30,7 @@ const IconPickerField: React.FC<IconPickerFieldProps> = ({
         <View style={containerStyle}>
           {label && (
             <Text
-              style={[framework.mb1, framework.fontSemiBold, framework.textSm, labelStyle]}
+              style={[framework.mb1, framework.fontSemiBold, framework.textSm, framework.text, labelStyle]}
             >
               {label}
               {required && ' *'}

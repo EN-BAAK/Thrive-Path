@@ -9,7 +9,7 @@ import framework from '../../styles/framework';
 import Variables from '../../styles/variables';
 import { deleteHabit } from '../../api/crud/habits';
 import { formatDate } from '../../misc/helpers';
-import { HabitType, RepeatInterval } from '../../types/variables';
+import { RepeatInterval } from '../../types/variables';
 import { weekdays } from '../../misc/global';
 
 const HabitCard: React.FC<CardProps<HabitWithCategory>> = ({ record: habit, onEdit, onSuccess }) => {
@@ -25,14 +25,6 @@ const HabitCard: React.FC<CardProps<HabitWithCategory>> = ({ record: habit, onEd
       setMenuVisible(false);
     }
   };
-
-  const isGoodHabit = habit.habitType === HabitType.GOOD;
-
-  const winButtonColor = isGoodHabit ? colors.success : colors.danger;
-  const loseButtonColor = isGoodHabit ? colors.danger : colors.success;
-
-  const winLabel = isGoodHabit ? `Do it` : `Resist it`;
-  const loseLabel = isGoodHabit ? `Skip it` : `Do it`;
 
   const getRepeatInfo = () => {
     if (!habit.repeatInterval) return 'One-time';
@@ -70,10 +62,10 @@ const HabitCard: React.FC<CardProps<HabitWithCategory>> = ({ record: habit, onEd
               <View style={[framework.bgBackground, framework.rounded, framework.shadowLight, framework.absolute, framework.top0, framework.right4, framework.overflowHidden]}
               >
                 <TouchableOpacity onPress={onEdit} style={[styles.menuItem, framework.py2, framework.px4]}>
-                  <Text>Edit</Text>
+                  <Text style={framework.text}>Edit</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={handleDelete} style={[styles.menuItem, framework.py2, framework.px4]}>
-                  <Text>Delete</Text>
+                  <Text style={framework.text}>Delete</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -87,41 +79,14 @@ const HabitCard: React.FC<CardProps<HabitWithCategory>> = ({ record: habit, onEd
         )}
       </LinearGradient>
 
-      <View style={[framework.p3]}>
-        <View style={[framework.flexRow, framework.alignCenter, framework.mb2]}>
-          <FontAwesome5 name="arrow-up" size={14} color={colors.success} style={framework.mr2} />
-          <Text style={[framework.fontBold, { color: colors.success }]}>+{habit.winPoints}</Text>
-        </View>
-
-        <View style={[framework.flexRow, framework.alignCenter, framework.mb2]}>
-          <FontAwesome5 name="arrow-down" size={14} color={colors.danger} style={framework.mr2} />
-          <Text style={[framework.fontBold, { color: colors.danger }]}>-{habit.losePoints}</Text>
-        </View>
-
-        {habit.repeatInterval && (
-          <View style={[framework.flexRow, framework.alignCenter]}>
-            <FontAwesome5 name="redo-alt" size={12} color={colors.muted} style={framework.mr2} />
-            <Text style={[framework.textSm, { color: colors.dark }]}>
-              {getRepeatInfo()}
-            </Text>
-          </View>
-        )}
-      </View>
-
-      <View style={[framework.px3, framework.pb3, framework.flexRow]}>
-        <TouchableOpacity style={[framework.mx1, framework.py2, framework.flexOne, framework.roundedMd, { backgroundColor: winButtonColor }]}
-        >
-          <Text style={[framework.textCenter, framework.fontBold, framework.textSm, framework.reversedText]}>
-            {winLabel}
+      {habit.repeatInterval && (
+        <View style={[framework.flexRow, framework.alignCenter, framework.p3]}>
+          <FontAwesome5 name="redo-alt" size={12} color={colors.muted} style={framework.mr2} />
+          <Text style={[framework.textSm, { color: colors.dark }]}>
+            {getRepeatInfo()}
           </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={[framework.mx1, framework.py2, framework.flexOne, framework.roundedMd, { backgroundColor: loseButtonColor }]}>
-          <Text style={[framework.textCenter, framework.fontBold, framework.textSm, framework.reversedText]}>
-            {loseLabel}
-          </Text>
-        </TouchableOpacity>
-      </View>
+        </View>
+      )}
 
       <View style={[styles.footer, framework.py2, framework.px4, framework.flexRow, framework.justifyBetween, framework.alignCenter]}>
         <View style={[framework.flexRow, framework.alignCenter, framework.gap2]}>

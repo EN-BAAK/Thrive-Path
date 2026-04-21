@@ -17,7 +17,7 @@ const SwitchField: React.FC<SwitchFieldProps> = ({
   return (
     <View style={[framework.flexRow, framework.alignCenter, framework.justifyBetween, containerStyle]}>
       {label && (
-        <Text style={[framework.textBase, labelStyle]}>
+        <Text style={[framework.textBase, framework.text, labelStyle]}>
           {label}
         </Text>
       )}

@@ -1,9 +1,8 @@
-import { getDatabase } from '../db';
 import { Goal, GoalWCategory, SafetyGoal } from '../../types/schemas';
-import initializeTableFunctions from '../../misc/database';
 import { initializeDatabase } from '../schema';
 import { Condition, IdentifyEntity, Status } from '../../types/variables';
 import { booleanToNumber } from '../../misc/helpers';
+import { initializeTableFunctions } from '../../misc/database';
 
 initializeDatabase();
 
@@ -12,7 +11,7 @@ const isTimestamp = true;
 
 export const createGoal = async (goal: SafetyGoal) => {
   try {
-    const goalsDB = await initializeTableFunctions(getDatabase, TABLE_NAME);
+    const goalsDB = await initializeTableFunctions(TABLE_NAME);
     return await goalsDB.insert(goal, isTimestamp);
   } catch (error) {
     console.error('[CREATE_GOAL] Error:', error);
@@ -22,7 +21,8 @@ export const createGoal = async (goal: SafetyGoal) => {
 
 export const findAllGoals = async (): Promise<GoalWCategory[]> => {
   try {
-    const goalsDB = await initializeTableFunctions(getDatabase, TABLE_NAME);
+    const goalsDB = await initializeTableFunctions(TABLE_NAME);
+
     return await goalsDB.findAll<GoalWCategory>(
       [],
       'goals.createdAt DESC',
@@ -42,7 +42,6 @@ export const findAllGoals = async (): Promise<GoalWCategory[]> => {
         { column: 'name', alias: "name" },
         { column: 'description', alias: "description" },
         { column: 'isImportant', alias: "isImportant" },
-        { column: 'points', alias: "points" },
         { column: 'deadline', alias: "deadline" },
         { column: 'status', alias: "status" },
         { column: 'priority', alias: "priority" },
@@ -58,7 +57,7 @@ export const findAllGoals = async (): Promise<GoalWCategory[]> => {
 };
 
 export const findGoalIdentities = async (): Promise<IdentifyEntity[]> => {
-  const goalsDB = await initializeTableFunctions(getDatabase, TABLE_NAME);
+  const goalsDB = await initializeTableFunctions(TABLE_NAME);
   return await goalsDB.findAll<IdentifyEntity>(
     [],
     "goals.createdAt DESC",
@@ -72,7 +71,7 @@ export const findGoalIdentities = async (): Promise<IdentifyEntity[]> => {
 
 export const updateGoal = async (id: number, updates: Partial<Goal>) => {
   try {
-    const goalsDB = await initializeTableFunctions(getDatabase, TABLE_NAME);
+    const goalsDB = await initializeTableFunctions(TABLE_NAME);
     return await goalsDB.update(id, updates);
   } catch (error) {
     console.error('[UPDATE_GOAL] Error:', error);
@@ -82,8 +81,10 @@ export const updateGoal = async (id: number, updates: Partial<Goal>) => {
 
 export const deleteGoal = async (id: number) => {
   try {
-    const goalsDB = await initializeTableFunctions(getDatabase, TABLE_NAME);
-    return await goalsDB.deleteById(id);
+    const goalsDB = await initializeTableFunctions(TABLE_NAME);
+    return await goalsDB.deleteOne([
+      { field: "id", operator: "=", value: id }
+    ]);
   } catch (error) {
     console.error('[DELETE_GOAL] Error:', error);
     throw error;
@@ -92,7 +93,7 @@ export const deleteGoal = async (id: number) => {
 
 export const findGoalById = async (id: number): Promise<GoalWCategory | null> => {
   try {
-    const goalsDB = await initializeTableFunctions(getDatabase, TABLE_NAME);
+    const goalsDB = await initializeTableFunctions(TABLE_NAME);
     return await goalsDB.findOne<GoalWCategory>(
       [{ field: 'id', value: id }],
       [
@@ -112,7 +113,6 @@ export const findGoalById = async (id: number): Promise<GoalWCategory | null> =>
         { column: 'name' },
         { column: 'description' },
         { column: 'isImportant' },
-        { column: 'points' },
         { column: 'deadline' },
         { column: 'status' },
         { column: 'priority' },
@@ -129,7 +129,7 @@ export const findGoalById = async (id: number): Promise<GoalWCategory | null> =>
 
 export const findGoal = async (conditions: Condition[]): Promise<Goal | null> => {
   try {
-    const goalsDB = await initializeTableFunctions(getDatabase, TABLE_NAME);
+    const goalsDB = await initializeTableFunctions(TABLE_NAME);
     return await goalsDB.findOne<Goal>(conditions);
   } catch (error) {
     console.error('[FIND_GOAL] Error:', error);
@@ -139,7 +139,7 @@ export const findGoal = async (conditions: Condition[]): Promise<Goal | null> =>
 
 export const updateIsImportantById = async (id: number, isImportant: boolean) => {
   try {
-    const goalsDB = await initializeTableFunctions(getDatabase, TABLE_NAME);
+    const goalsDB = await initializeTableFunctions(TABLE_NAME);
     return await goalsDB.update(id, { isImportant: booleanToNumber(isImportant) });
   } catch (error) {
     console.error('[UPDATE_ISIMPORTANT] Error:', error);
@@ -149,7 +149,7 @@ export const updateIsImportantById = async (id: number, isImportant: boolean) =>
 
 export const updateGoalStatusById = async (id: number, status: Status) => {
   try {
-    const goalsDB = await initializeTableFunctions(getDatabase, TABLE_NAME);
+    const goalsDB = await initializeTableFunctions(TABLE_NAME);
     return await goalsDB.update(id, { status });
   } catch (error) {
     console.error('[UPDATE_STATUS] Error:', error);

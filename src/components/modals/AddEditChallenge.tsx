@@ -110,22 +110,6 @@ const AddEditChallengeModal: React.FC<AddEditChallengeModalProps> = ({
                       />
 
                       <InputField
-                        name="points"
-                        label="Reward Points"
-                        required
-                        type="numeric"
-                        placeholder="e.g. 100"
-                      />
-
-                      <InputField
-                        name="penaltyPoints"
-                        label="Penalty Points"
-                        required
-                        type="numeric"
-                        placeholder="e.g. 50"
-                      />
-
-                      <InputField
                         name="targetValue"
                         label="Target Value"
                         required

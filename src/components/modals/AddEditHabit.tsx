@@ -136,24 +136,6 @@ const AddEditHabitModal: React.FC<AddEditHabitModalProps> = ({
                         containerStyle={framework.mb3}
                       />
 
-                      <InputField
-                        name="winPoints"
-                        label="Win Points"
-                        required
-                        type="numeric"
-                        placeholder="Enter points earned"
-                        containerStyle={framework.mb2}
-                      />
-
-                      <InputField
-                        name="losePoints"
-                        label="Lose Points"
-                        required
-                        type="numeric"
-                        placeholder="Enter points lost"
-                        containerStyle={framework.mb2}
-                      />
-
                       <SelectField
                         name="goalId"
                         label="Goal"

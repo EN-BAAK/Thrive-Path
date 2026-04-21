@@ -1,6 +1,6 @@
 import { TextStyle, ViewStyle } from "react-native";
 
-type Operation = '=' | '!=' | '<' | '<=' | '>' | '>=' | 'LIKE';
+export type Operation = '=' | '!=' | '<' | '<=' | '>' | '>=' | 'LIKE' | 'IN' | "IS";
 type JoinTypes = 'INNER' | 'LEFT' | 'RIGHT' | 'FULL';
 export enum Status {
   PENDING = "PENDING",
@@ -44,6 +44,11 @@ export type SelectOption = {
   label: string;
   value: any;
 };
+
+export type Pagination = {
+  limit?: number,
+  offset?: number
+}
 
 export type ThemeColors = {
   mainColor: string;

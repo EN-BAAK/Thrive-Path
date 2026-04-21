@@ -1,8 +1,7 @@
-import { getDatabase } from '../db';
-import initializeTableFunctions from '../../misc/database';
 import { initializeDatabase } from '../schema';
 import { booleanToNumber } from '../../misc/helpers';
 import { Task, TaskWithCategoryAndSubtasks, SafeTask, SafeSubtask, Subtask } from '../../types/schemas';
+import { initializeTableFunctions } from '../../misc/database';
 
 initializeDatabase();
 
@@ -13,7 +12,7 @@ const subtaskIsTimestamp = false
 
 export const createTask = async (task: SafeTask) => {
   try {
-    const tasksDB = await initializeTableFunctions(getDatabase, TASKS_TABLE);
+    const tasksDB = await initializeTableFunctions(TASKS_TABLE);
     return await tasksDB.insert(task, taskIsTimestamp);
   } catch (error) {
     console.error('[CREATE_TASK] Error:', error);
@@ -23,7 +22,7 @@ export const createTask = async (task: SafeTask) => {
 
 export const createSubtask = async (subtask: SafeSubtask, parentTaskId: number) => {
   try {
-    const subtasksDB = await initializeTableFunctions(getDatabase, SUBTASKS_TABLE);
+    const subtasksDB = await initializeTableFunctions(SUBTASKS_TABLE);
     return await subtasksDB.insert({ ...subtask, parentTaskId }, subtaskIsTimestamp);
   } catch (error) {
     console.error('[CREATE_SUBTASK] Error:', error);
@@ -33,7 +32,7 @@ export const createSubtask = async (subtask: SafeSubtask, parentTaskId: number) 
 
 export const findAllTasks = async (): Promise<TaskWithCategoryAndSubtasks[]> => {
   try {
-    const tasksDB = await initializeTableFunctions(getDatabase, TASKS_TABLE);
+    const tasksDB = await initializeTableFunctions(TASKS_TABLE);
     const allTasks = await tasksDB.findAll<TaskWithCategoryAndSubtasks>(
       [],
       'tasks.createdAt DESC',
@@ -54,13 +53,12 @@ export const findAllTasks = async (): Promise<TaskWithCategoryAndSubtasks[]> => 
         { column: 'description', alias: 'description' },
         { column: 'isCompleted', alias: 'isCompleted' },
         { column: 'isImportant', alias: 'isImportant' },
-        { column: 'points', alias: 'points' },
         { column: 'categoryId', alias: 'categoryId' },
         { column: 'createdAt', alias: 'createdAt' },
         { column: 'updatedAt', alias: 'updatedAt' }
       ]
     );
-    const subtasksDB = await initializeTableFunctions(getDatabase, SUBTASKS_TABLE);
+    const subtasksDB = await initializeTableFunctions(SUBTASKS_TABLE);
     for (const task of allTasks) {
       const subtasks = await subtasksDB.findAll<Subtask>(
         [{ table: 'subtasks', field: 'parentTaskId', value: task.id }]
@@ -78,7 +76,7 @@ export const findAllTasks = async (): Promise<TaskWithCategoryAndSubtasks[]> => 
 
 export const findTaskById = async (id: number): Promise<TaskWithCategoryAndSubtasks | null> => {
   try {
-    const tasksDB = await initializeTableFunctions(getDatabase, TASKS_TABLE);
+    const tasksDB = await initializeTableFunctions(TASKS_TABLE);
 
     const task = await tasksDB.findOne<TaskWithCategoryAndSubtasks>(
       [{ field: 'id', value: id }],
@@ -99,7 +97,6 @@ export const findTaskById = async (id: number): Promise<TaskWithCategoryAndSubta
         { column: 'description', alias: 'description' },
         { column: 'isCompleted', alias: 'isCompleted' },
         { column: 'isImportant', alias: 'isImportant' },
-        { column: 'points', alias: 'points' },
         { column: 'categoryId', alias: 'categoryId' },
         { column: 'createdAt', alias: 'createdAt' },
         { column: 'updatedAt', alias: 'updatedAt' }
@@ -108,7 +105,7 @@ export const findTaskById = async (id: number): Promise<TaskWithCategoryAndSubta
 
     if (!task) return null;
 
-    const subtasksDB = await initializeTableFunctions(getDatabase, SUBTASKS_TABLE);
+    const subtasksDB = await initializeTableFunctions(SUBTASKS_TABLE);
     const subtasks = await subtasksDB.findAll<Subtask>(
       [{ table: 'subtasks', field: 'parentTaskId', value: task.id }]
     );
@@ -123,7 +120,7 @@ export const findTaskById = async (id: number): Promise<TaskWithCategoryAndSubta
 
 export const updateTask = async (id: number, updates: Partial<Task>) => {
   try {
-    const tasksDB = await initializeTableFunctions(getDatabase, TASKS_TABLE);
+    const tasksDB = await initializeTableFunctions(TASKS_TABLE);
     return await tasksDB.update(id, updates, taskIsTimestamp);
   } catch (error) {
     console.error('[UPDATE_TASK] Error:', error);
@@ -133,8 +130,10 @@ export const updateTask = async (id: number, updates: Partial<Task>) => {
 
 export const deleteTask = async (id: number) => {
   try {
-    const tasksDB = await initializeTableFunctions(getDatabase, TASKS_TABLE);
-    return await tasksDB.deleteById(id);
+    const tasksDB = await initializeTableFunctions(TASKS_TABLE);
+    return await tasksDB.deleteOne([
+      { field: 'id', value: id, operator: '=' }
+    ]);
   } catch (error) {
     console.error('[DELETE_TASK] Error:', error);
     throw error;
@@ -143,8 +142,10 @@ export const deleteTask = async (id: number) => {
 
 export const deleteSubtask = async (id: number) => {
   try {
-    const subtasksDB = await initializeTableFunctions(getDatabase, SUBTASKS_TABLE);
-    return await subtasksDB.deleteById(id);
+    const subtasksDB = await initializeTableFunctions(SUBTASKS_TABLE);
+    return await subtasksDB.deleteOne([
+      { field: 'id', value: id, operator: '=' }
+    ]);
   } catch (error) {
     console.error('[DELETE_SUBTASK] Error:', error);
     throw error;
@@ -153,7 +154,7 @@ export const deleteSubtask = async (id: number) => {
 
 export const updateTaskImportantById = async (id: number, isImportant: boolean) => {
   try {
-    const tasksDB = await initializeTableFunctions(getDatabase, TASKS_TABLE);
+    const tasksDB = await initializeTableFunctions(TASKS_TABLE);
     return await tasksDB.update(id, { isImportant: booleanToNumber(isImportant) });
   } catch (error) {
     console.error('[UPDATE_TASK_IMPORTANT] Error:', error);
@@ -162,7 +163,7 @@ export const updateTaskImportantById = async (id: number, isImportant: boolean) 
 };
 export const updateSubtaskImportantById = async (id: number, isImportant: boolean) => {
   try {
-    const subtasksDB = await initializeTableFunctions(getDatabase, SUBTASKS_TABLE);
+    const subtasksDB = await initializeTableFunctions(SUBTASKS_TABLE);
     return await subtasksDB.update(id, { isImportant: booleanToNumber(isImportant) }, subtaskIsTimestamp);
   } catch (error) {
     console.error('[UPDATE_SUBTASK_IMPORTANT] Error:', error);
@@ -172,7 +173,7 @@ export const updateSubtaskImportantById = async (id: number, isImportant: boolea
 
 export const updateTaskIsCompletedById = async (id: number, isCompleted: boolean) => {
   try {
-    const tasksDB = await initializeTableFunctions(getDatabase, TASKS_TABLE);
+    const tasksDB = await initializeTableFunctions(TASKS_TABLE);
     return await tasksDB.update(id, { isCompleted: booleanToNumber(isCompleted) });
   } catch (error) {
     console.error('[UPDATE_TASK_COMPLETED] Error:', error);
@@ -182,7 +183,7 @@ export const updateTaskIsCompletedById = async (id: number, isCompleted: boolean
 
 export const updateSubtaskCompletedById = async (id: number, isCompleted: boolean) => {
   try {
-    const subtasksDB = await initializeTableFunctions(getDatabase, SUBTASKS_TABLE);
+    const subtasksDB = await initializeTableFunctions(SUBTASKS_TABLE);
     return await subtasksDB.update(id, { isCompleted: booleanToNumber(isCompleted) }, subtaskIsTimestamp);
   } catch (error) {
     console.error('[UPDATE_SUBTASK_COMPLETED] Error:', error);

@@ -31,7 +31,7 @@ const DatePickerField: React.FC<DatePickerFieldProps> = ({
   return (
     <View style={containerStyle}>
       {label && (
-        <Text style={[framework.mb1, framework.fontSemiBold, framework.textSm, framework.dark, labelStyle]}>
+        <Text style={[framework.mb1, framework.fontSemiBold, framework.textSm, framework.text, labelStyle]}>
           {label}
           {required && ' *'}
         </Text>
@@ -41,7 +41,7 @@ const DatePickerField: React.FC<DatePickerFieldProps> = ({
         onPress={openDatePicker}
         style={[framework.input, styles.dateInput]}
       >
-        <Text style={field.value ? framework.textDark : framework.textMuted}>
+        <Text style={field.value ? framework.text : framework.textMuted}>
           {field.value ? new Date(field.value).toDateString() : 'Select a date'}
         </Text>
       </TouchableOpacity>

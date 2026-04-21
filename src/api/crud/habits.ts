@@ -1,7 +1,6 @@
-import { getDatabase } from '../db';
-import initializeTableFunctions from '../../misc/database';
 import { initializeDatabase } from '../schema';
 import { Habit, HabitFetchedQuery, HabitWithCategory, SafeHabit } from '../../types/schemas';
+import { initializeTableFunctions } from '../../misc/database';
 
 initializeDatabase();
 
@@ -10,7 +9,7 @@ const isTimestamp = true;
 
 export const createHabit = async (habit: SafeHabit) => {
   try {
-    const habitsDB = await initializeTableFunctions(getDatabase, TABLE_NAME);
+    const habitsDB = await initializeTableFunctions(TABLE_NAME);
     return await habitsDB.insert(habit, isTimestamp);
   } catch (error) {
     console.error('[CREATE_HABIT] Error:', error);
@@ -20,7 +19,7 @@ export const createHabit = async (habit: SafeHabit) => {
 
 export const getHabit = async (id: number): Promise<HabitWithCategory | null> => {
   try {
-    const habitsDB = await initializeTableFunctions(getDatabase, TABLE_NAME);
+    const habitsDB = await initializeTableFunctions(TABLE_NAME);
 
     const habit = await habitsDB.findOne<HabitFetchedQuery>(
       [{ field: 'id', value: id }],
@@ -81,7 +80,7 @@ export const getHabit = async (id: number): Promise<HabitWithCategory | null> =>
 
 export const getHabits = async (): Promise<HabitWithCategory[]> => {
   try {
-    const habitsDB = await initializeTableFunctions(getDatabase, TABLE_NAME);
+    const habitsDB = await initializeTableFunctions(TABLE_NAME);
 
     const habits = await habitsDB.findAll<HabitFetchedQuery>(
       [],
@@ -144,7 +143,7 @@ export const getHabits = async (): Promise<HabitWithCategory[]> => {
 
 export const updateHabit = async (id: number, updates: Partial<Habit>) => {
   try {
-    const habitsDB = await initializeTableFunctions(getDatabase, TABLE_NAME);
+    const habitsDB = await initializeTableFunctions(TABLE_NAME);
     return await habitsDB.update(id, updates, isTimestamp);
   } catch (error) {
     console.error('[UPDATE_HABIT] Error:', error);
@@ -154,8 +153,10 @@ export const updateHabit = async (id: number, updates: Partial<Habit>) => {
 
 export const deleteHabit = async (id: number) => {
   try {
-    const habitsDB = await initializeTableFunctions(getDatabase, TABLE_NAME);
-    return await habitsDB.deleteById(id);
+    const habitsDB = await initializeTableFunctions(TABLE_NAME);
+    return await habitsDB.deleteOne([
+      { field: 'id', value: id, operator: '=' }
+    ]);
   } catch (error) {
     console.error('[DELETE_HABIT] Error:', error);
     throw error;

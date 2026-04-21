@@ -1,7 +1,6 @@
-import { getDatabase } from '../db';
-import initializeTableFunctions from '../../misc/database';
 import { initializeDatabase } from '../schema';
 import { TimerLog, SafeTimerLog } from '../../types/schemas';
+import { initializeTableFunctions } from '../../misc/database';
 
 initializeDatabase();
 
@@ -10,7 +9,7 @@ const timerLogIsTimestamp = false;
 
 export const createTimerLog = async (log: Omit<SafeTimerLog, 'description'>) => {
   try {
-    const timerLogsDB = await initializeTableFunctions(getDatabase, TIMER_LOGS_TABLE);
+    const timerLogsDB = await initializeTableFunctions(TIMER_LOGS_TABLE);
     return await timerLogsDB.insert(log, timerLogIsTimestamp);
   } catch (error) {
     console.error('[CREATE_TIMER_LOG] Error:', error);
@@ -20,7 +19,7 @@ export const createTimerLog = async (log: Omit<SafeTimerLog, 'description'>) => 
 
 export const getAllTimerLogsByType = async (type: string): Promise<TimerLog[]> => {
   try {
-    const timerLogsDB = await initializeTableFunctions(getDatabase, TIMER_LOGS_TABLE);
+    const timerLogsDB = await initializeTableFunctions(TIMER_LOGS_TABLE);
     return await timerLogsDB.findAll<TimerLog>(
       [{ field: 'type', value: type }],
       'timer_logs.id DESC'
@@ -33,7 +32,7 @@ export const getAllTimerLogsByType = async (type: string): Promise<TimerLog[]> =
 
 export const updateTimerLogDescription = async (id: number, description: string) => {
   try {
-    const timerLogsDB = await initializeTableFunctions(getDatabase, TIMER_LOGS_TABLE);
+    const timerLogsDB = await initializeTableFunctions(TIMER_LOGS_TABLE);
     return await timerLogsDB.update(id, { description }, timerLogIsTimestamp);
   } catch (error) {
     console.error('[UPDATE_TIMER_LOG_DESCRIPTION] Error:', error);
@@ -43,8 +42,10 @@ export const updateTimerLogDescription = async (id: number, description: string)
 
 export const deleteTimerLogById = async (id: number) => {
   try {
-    const timerLogsDB = await initializeTableFunctions(getDatabase, TIMER_LOGS_TABLE);
-    return await timerLogsDB.deleteById(id);
+    const timerLogsDB = await initializeTableFunctions(TIMER_LOGS_TABLE);
+    return await timerLogsDB.deleteOne([
+      { field: "id", value: id, operator: "=" }
+    ]);
   } catch (error) {
     console.error('[DELETE_TIMER_LOG] Error:', error);
     throw error;

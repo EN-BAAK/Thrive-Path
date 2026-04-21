@@ -1,8 +1,7 @@
-import { getDatabase } from '../db';
-import initializeTableFunctions from '../../misc/database';
 import { initializeDatabase } from '../schema';
 import { booleanToNumber } from '../../misc/helpers';
 import { Challenge, SafeChallenge } from '../../types/schemas';
+import { initializeTableFunctions } from '../../misc/database';
 
 initializeDatabase();
 
@@ -11,7 +10,8 @@ const isTimestamp = true;
 
 export const createChallenge = async (challenge: SafeChallenge) => {
   try {
-    const challengesDB = await initializeTableFunctions(getDatabase, TABLE_NAME);
+    challenge.currentHearts = challenge.maxHearts || 0;
+    const challengesDB = await initializeTableFunctions(TABLE_NAME);
     return await challengesDB.insert(challenge, isTimestamp);
   } catch (error) {
     console.error('[CREATE_CHALLENGE] Error:', error);
@@ -21,7 +21,7 @@ export const createChallenge = async (challenge: SafeChallenge) => {
 
 export const findAllChallenges = async (): Promise<Challenge[]> => {
   try {
-    const challengesDB = await initializeTableFunctions(getDatabase, TABLE_NAME);
+    const challengesDB = await initializeTableFunctions(TABLE_NAME);
     return await challengesDB.findAll<Challenge>(
       [],
       'challenges.createdAt DESC',
@@ -30,8 +30,6 @@ export const findAllChallenges = async (): Promise<Challenge[]> => {
         { column: 'id', alias: 'id' },
         { column: 'title', alias: 'title' },
         { column: 'description', alias: 'description' },
-        { column: 'points', alias: 'points' },
-        { column: 'penaltyPoints', alias: 'penaltyPoints' },
         { column: 'targetValue', alias: 'targetValue' },
         { column: 'startDate', alias: 'startDate' },
         { column: 'endDate', alias: 'endDate' },
@@ -53,7 +51,7 @@ export const findAllChallenges = async (): Promise<Challenge[]> => {
 
 export const findChallengeById = async (id: number): Promise<Challenge | null> => {
   try {
-    const challengesDB = await initializeTableFunctions(getDatabase, TABLE_NAME);
+    const challengesDB = await initializeTableFunctions(TABLE_NAME);
     return await challengesDB.findOne<Challenge>(
       [{ field: 'id', value: id }],
       [],
@@ -61,8 +59,6 @@ export const findChallengeById = async (id: number): Promise<Challenge | null> =
         { column: 'id', alias: 'id' },
         { column: 'title', alias: 'title' },
         { column: 'description', alias: 'description' },
-        { column: 'points', alias: 'points' },
-        { column: 'penaltyPoints', alias: 'penaltyPoints' },
         { column: 'targetValue', alias: 'targetValue' },
         { column: 'startDate', alias: 'startDate' },
         { column: 'endDate', alias: 'endDate' },
@@ -84,7 +80,7 @@ export const findChallengeById = async (id: number): Promise<Challenge | null> =
 
 export const updateChallenge = async (id: number, updates: Partial<Challenge>) => {
   try {
-    const challengesDB = await initializeTableFunctions(getDatabase, TABLE_NAME);
+    const challengesDB = await initializeTableFunctions(TABLE_NAME);
     return await challengesDB.update(id, updates, isTimestamp);
   } catch (error) {
     console.error('[UPDATE_CHALLENGE] Error:', error);
@@ -94,8 +90,10 @@ export const updateChallenge = async (id: number, updates: Partial<Challenge>) =
 
 export const deleteChallenge = async (id: number) => {
   try {
-    const challengesDB = await initializeTableFunctions(getDatabase, TABLE_NAME);
-    return await challengesDB.deleteById(id);
+    const challengesDB = await initializeTableFunctions(TABLE_NAME);
+    return await challengesDB.deleteOne([
+      { field: "id", value: id, operator: "=" }
+    ]);
   } catch (error) {
     console.error('[DELETE_CHALLENGE] Error:', error);
     throw error;
@@ -106,6 +104,7 @@ export const deleteHeart = async (id: number) => {
   try {
     const challenge = await findChallengeById(id);
     if (!challenge) throw new Error(`Challenge with id ${id} not found`);
+    console.log("Challenge", challenge)
     const newHearts = Math.max(0, (challenge.currentHearts || 0) - 1);
     return await updateChallenge(id, { currentHearts: newHearts });
   } catch (error) {
@@ -128,7 +127,7 @@ export const addStar = async (id: number) => {
 
 export const updateChallengeCompletedById = async (id: number, isCompleted: boolean) => {
   try {
-    const challengesDB = await initializeTableFunctions(getDatabase, TABLE_NAME);
+    const challengesDB = await initializeTableFunctions(TABLE_NAME);
     return await challengesDB.update(id, { isCompleted: booleanToNumber(isCompleted) }, isTimestamp);
   } catch (error) {
     console.error('[UPDATE_CHALLENGE_COMPLETED] Error:', error);

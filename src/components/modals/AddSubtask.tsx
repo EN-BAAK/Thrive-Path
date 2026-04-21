@@ -60,14 +60,6 @@ const AddSubtaskModal: React.FC<AddSubtaskModalProps> = ({ visible, onClose, onS
                         containerStyle={framework.mb2}
                       />
 
-                      <InputField
-                        name="points"
-                        label="Points"
-                        placeholder="Enter points"
-                        type="numeric"
-                        containerStyle={framework.mb2}
-                      />
-
                       <SwitchField
                         name="isImportant"
                         label="Important?"

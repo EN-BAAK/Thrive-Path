@@ -58,70 +58,62 @@ const TaskCard: React.FC<CardProps<TaskWithCategoryAndSubtasks>> = ({ record: ta
   };
 
   return (
-    <View style={[framework.card, framework.bgBackground, framework.mb2, framework.p0, framework.relative, framework.overflowHidden]}>
-      <View style={[styles.strip, framework.h100, framework.absolute, framework.top0, framework.left0, { backgroundColor: task.categoryColor }]} />
+    <View style={[framework.card, framework.bgBackground, framework.mb2, framework.p0, framework.relative, framework.indexBehind, framework.overflowHidden]}>
+      <View style={[styles.strip, framework.h100, framework.absolute, framework.top0, framework.left0, framework.index1, { backgroundColor: task.categoryColor }]} />
 
       <LinearGradient
         colors={[task.categoryColor, `${task.categoryColor}99`]}
         style={[framework.p4, framework.pb2, framework.roundedTop]}
       >
-        <View style={[framework.flexRow, framework.justifyBetween, framework.alignCenter]}>
-          <View style={[framework.flexOne, framework.flexRow, framework.alignCenter, framework.gap2]}>
-            <TouchableOpacity onPress={toggleCompleted} style={framework.p1} hitSlop={10}>
-              <FontAwesome5
-                name={task.isCompleted ? 'check-circle' : 'circle'}
-                size={18}
-                color={task.isCompleted ? colors.success : Variables.reversedTextColor}
-              />
-            </TouchableOpacity>
+        <View style={[framework.flexOne, framework.flexRow, framework.alignCenter, framework.gap2]}>
+          <View style={[framework.flexOne]}>
+            <View style={[framework.flexRow, framework.alignCenter]}>
+              <TouchableOpacity onPress={toggleCompleted} style={framework.p1} hitSlop={10}>
+                <FontAwesome5
+                  name={task.isCompleted ? 'check-circle' : 'circle'}
+                  size={18}
+                  color={task.isCompleted ? colors.success : Variables.reversedTextColor}
+                />
+              </TouchableOpacity>
 
-            <View style={[framework.flexOne]}>
-              <Text style={[framework.fontBold, framework.textLg, framework.reversedText, task.isCompleted && styles.completed,]}
+              <Text style={[framework.flexOne, framework.fontBold, framework.textLg, framework.reversedText, task.isCompleted && styles.completed,]}
                 numberOfLines={1}
               >
                 {task.title}
               </Text>
 
-              <View style={[framework.mt1, framework.flexRow, framework.alignCenter, framework.gap1]}>
-                <MaterialCommunityIcons name="tag-outline" size={14} color={Variables.reversedTextColor} />
-                <Text style={[framework.textXs, framework.reversedText]} numberOfLines={1}>
-                  {task.categoryName}
-                </Text>
-              </View>
+              <View style={[framework.flexRow, framework.alignCenter, framework.relative, framework.index1]}>
+                <TouchableOpacity onPress={toggleImportant} style={framework.p1} hitSlop={10}>
+                  <AntDesign
+                    name={task.isImportant ? 'star' : 'staro'}
+                    size={16}
+                    color={task.isImportant ? colors.warning : Variables.reversedTextColor}
+                  />
+                </TouchableOpacity>
 
-              <View style={[framework.mt1, framework.flexRow, framework.alignCenter, framework.gap1]}>
-                <FontAwesome5 name="award" size={12} color={Variables.reversedTextColor} />
-                <Text style={[framework.textXs, framework.reversedText]}>
-                  {task.points ?? 0} pts
-                </Text>
+                <TouchableOpacity onPress={() => setMenuOpen((v) => !v)} style={framework.p1} hitSlop={10}>
+                  <FontAwesome5 name="ellipsis-v" size={16} color={Variables.reversedTextColor} />
+                </TouchableOpacity>
+
+                {menuOpen && (
+                  <View style={[framework.bgLight, framework.rounded, framework.shadowLight, framework.absolute, framework.top0, framework.right4, framework.overflowHidden]}>
+                    <TouchableOpacity onPress={onEdit} style={[styles.menuItem, framework.py2, framework.px4]}>
+                      <Text style={framework.text}>Edit</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={handleDelete} style={[styles.menuItem, framework.py2, framework.px4]}>
+                      <Text style={framework.text}>Delete</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
             </View>
-          </View>
 
-          <View style={[framework.flexRow, framework.alignCenter, framework.relative]}>
-            <TouchableOpacity onPress={toggleImportant} style={framework.p1} hitSlop={10}>
-              <AntDesign
-                name={task.isImportant ? 'star' : 'staro'}
-                size={16}
-                color={task.isImportant ? colors.warning : Variables.reversedTextColor}
-              />
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={() => setMenuOpen((v) => !v)} style={framework.p1} hitSlop={10}>
-              <FontAwesome5 name="ellipsis-v" size={16} color={Variables.reversedTextColor} />
-            </TouchableOpacity>
-
-            {menuOpen && (
-              <View style={[framework.bgBackground, framework.rounded, framework.shadowLight, framework.absolute, framework.top0, framework.right3, framework.overflowHidden,]}
-              >
-                <TouchableOpacity onPress={onEdit} style={[styles.menuItem, framework.py2, framework.px4]}>
-                  <Text>Edit</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={handleDelete} style={[styles.menuItem, framework.py2, framework.px4]}>
-                  <Text>Delete</Text>
-                </TouchableOpacity>
-              </View>
-            )}
+            <View style={[framework.mt1, framework.flexRow, framework.alignCenter, framework.gap1]}>
+              <MaterialCommunityIcons name="tag-outline" size={14} color={Variables.reversedTextColor} />
+              <Text style={[framework.textXs, framework.reversedText]} numberOfLines={1}>
+                {task.categoryName}
+              </Text>
+            </View>
           </View>
         </View>
 
@@ -132,16 +124,15 @@ const TaskCard: React.FC<CardProps<TaskWithCategoryAndSubtasks>> = ({ record: ta
         )}
       </LinearGradient>
 
-      <View style={[styles.footer, framework.py2, framework.px3, framework.flexRow, framework.justifyBetween, framework.alignCenter,]}
-      >
+      <View style={[styles.footer, framework.py2, framework.px3, framework.flexRow, framework.justifyBetween, framework.alignCenter, framework.indexBehind]}>
         <Text style={[framework.textXs, framework.textMuted]}>Created {formatDate(task.createdAt)}</Text>
 
         <TouchableOpacity
           onPress={toggleAccordion}
-          style={[styles.metaPill, framework.py1, framework.px3, framework.flexRow, framework.alignCenter, framework.roundedPill,]}
+          style={[styles.metaPill, framework.py1, framework.px3, framework.flexRow, framework.alignCenter, framework.roundedPill, framework.gap1]}
         >
           <FontAwesome5 name={open ? 'chevron-up' : 'chevron-down'} size={12} color={colors.text} />
-          <Text style={[framework.textXs, framework.ml1]}>
+          <Text style={[framework.textXs, framework.ml1m, framework.text]}>
             {open ? 'Hide subtasks' : `Show subtasks (${task.subtasks?.length || 0})`}
           </Text>
         </TouchableOpacity>
@@ -183,7 +174,6 @@ const styles = StyleSheet.create({
   },
   strip: {
     width: 5,
-    zIndex: 2,
   },
   completed: {
     textDecorationLine: 'line-through',

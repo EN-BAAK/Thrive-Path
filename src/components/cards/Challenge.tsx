@@ -44,8 +44,11 @@ const ChallengeCard: React.FC<CardProps<Challenge>> = ({ record: challenge, onEd
     onSuccess?.();
   };
 
+  const isHeartsExists: boolean = Boolean(challenge.maxHearts && challenge.maxHearts > 0);
+  const isStarsExists: boolean = Boolean(challenge.maxStars && challenge.maxStars > 0);
+
   return (
-    <View style={[framework.card, framework.bgBackground, framework.p0, framework.overflowHidden]}>
+    <View style={[framework.card, framework.bgBackground, framework.p0, framework.indexBehind, framework.overflowHidden]}>
       <LinearGradient
         colors={[colors.primary, `${colors.primary}99`]}
         style={[framework.p4, framework.pb2]}
@@ -69,12 +72,12 @@ const ChallengeCard: React.FC<CardProps<Challenge>> = ({ record: challenge, onEd
             </TouchableOpacity>
 
             {menuVisible && (
-              <View style={[framework.bgBackground, framework.rounded, framework.shadowLight, framework.absolute, framework.top0, framework.right4, framework.overflowHidden]}>
+              <View style={[framework.bgBackground, framework.rounded, framework.shadowLight, framework.absolute, framework.top0, framework.right4, framework.index1, framework.overflowHidden]}>
                 <TouchableOpacity onPress={onEdit} style={[styles.menuItem, framework.py2, framework.px4]}>
-                  <Text>Edit</Text>
+                  <Text style={framework.text}>Edit</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={handleDelete} style={[styles.menuItem, framework.py2, framework.px4]}>
-                  <Text>Delete</Text>
+                  <Text style={framework.text}>Delete</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -88,60 +91,43 @@ const ChallengeCard: React.FC<CardProps<Challenge>> = ({ record: challenge, onEd
         )}
       </LinearGradient>
 
-      <View style={[framework.p3]}>
+      {isHeartsExists && isStarsExists &&
+        <View style={[framework.flexRow, framework.justifyBetween, framework.alignCenter, framework.p3]}>
+          {isStarsExists && (
+            <View style={[framework.flexRow, framework.alignCenter, framework.flexWrap]}>
+              {Array.from({ length: challenge.maxStars || 0 }).map((_, i) => (
+                <AntDesign
+                  key={`star-${i}`}
+                  name="star"
+                  size={16}
+                  color={i < (challenge.currentStars || 0) ? colors.warning : colors.lightGray}
+                  style={framework.mr1}
+                />
+              ))}
+            </View>
+          )}
 
-        {challenge.maxStars && challenge.maxStars > 0 && (
-          <View style={[framework.flexRow, framework.alignCenter, framework.mb2, framework.flexWrap]}>
-            {Array.from({ length: challenge.maxStars }).map((_, i) => (
-              <AntDesign
-                key={`star-${i}`}
-                name="star"
-                size={16}
-                color={i < (challenge.currentStars || 0) ? colors.warning : colors.lightGray}
-                style={framework.mr1}
-              />
-            ))}
-          </View>
-        )}
-
-        {challenge.maxHearts && challenge.maxHearts > 0 && (
-          <View style={[framework.flexRow, framework.alignCenter, framework.mb2, framework.flexWrap]}>
-            {Array.from({ length: challenge.maxHearts }).map((_, i) => {
-              const indexFromRight = (challenge.maxHearts || 0) - 1 - i;
-              const isFilled = indexFromRight < (challenge.currentHearts || 0);
-
-              return (
+          {isHeartsExists && (
+            <View style={[framework.flexRow, framework.alignCenter, framework.flexWrap]}>
+              {Array.from({ length: challenge.maxHearts || 0 }).map((_, i) => (
                 <AntDesign
                   key={`heart-${i}`}
                   name="heart"
                   size={16}
-                  color={isFilled ? colors.lightGray : colors.danger}
+                  color={i < (challenge.currentHearts || 0) ? colors.danger : colors.lightGray}
                   style={framework.mr1}
                 />
-              );
-            })}
-          </View>
-        )}
-
-        <View style={[framework.flexRow, framework.alignCenter, framework.mb2]}>
-          <FontAwesome5 name="arrow-up" size={12} color={colors.success} style={framework.mr2} />
-          <Text style={[framework.textSm, { color: colors.success }]}>+{challenge.points} pts</Text>
+              ))}
+            </View>
+          )}
         </View>
-
-        <View style={[framework.flexRow, framework.alignCenter]}>
-          <FontAwesome5 name="arrow-down" size={12} color={colors.danger} style={framework.mr2} />
-          <Text style={[framework.textSm, { color: colors.danger }]}>-{challenge.penaltyPoints} pts</Text>
-        </View>
-      </View>
+      }
 
       <View style={[framework.px3, framework.pb3]}>
         <View style={[framework.flexRow, framework.justifyBetween, framework.alignCenter, framework.mb2]}>
           <Text style={[framework.textSm, framework.textMuted]}>
             {formatDate(challenge.startDate)} → {formatDate(challenge.endDate)}
           </Text>
-          {Boolean(challenge.isCompleted) && (
-            <Text style={[framework.fontBold, framework.textSm, framework.textSuccess]}>✔ Completed</Text>
-          )}
         </View>
 
         <View style={[framework.flexRow, framework.gap3]}>

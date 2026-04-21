@@ -116,14 +116,6 @@ const AddEditTaskModal: React.FC<AddEditTaskModalProps> = ({
                         thumbColor={{ true: Variables.mainColor, false: colors.gray }}
                       />
 
-                      <InputField
-                        name="points"
-                        label="Points"
-                        placeholder="Enter points"
-                        type="numeric"
-                        containerStyle={framework.mb2}
-                      />
-
                       <SwitchField
                         name="isCompleted"
                         label="Completed?"

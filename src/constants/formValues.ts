@@ -6,7 +6,6 @@ export const defaultGoal: Goal = {
   name: "",
   description: "",
   isImportant: false,
-  points: 0,
   deadline: new Date().toISOString(),
   status: Status.PENDING,
   priority: 1,
@@ -28,7 +27,6 @@ export const defaultTask: Task = {
   description: '',
   isCompleted: false,
   isImportant: false,
-  points: 0,
   categoryId: undefined,
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString()
@@ -37,7 +35,6 @@ export const defaultTask: Task = {
 export const defaultSubtask: SafeSubtask = {
   title: '',
   isCompleted: false,
-  points: 0,
   isImportant: false,
 };
 
@@ -46,8 +43,6 @@ export const defaultHabit: Habit = {
   title: '',
   description: '',
   habitType: HabitType.GOOD,
-  winPoints: 0,
-  losePoints: 0,
   repeatInterval: RepeatInterval.DAILY,
   customIntervalDays: undefined,
   repeatWeekDay: undefined,
@@ -63,8 +58,6 @@ export const defaultChallenge: Challenge = {
   id: -1,
   title: '',
   description: '',
-  points: 0,
-  penaltyPoints: 0,
   targetValue: 0,
   maxHearts: 0,
   maxStars: 0,

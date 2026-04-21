@@ -61,11 +61,6 @@ const SubtaskCard: React.FC<CardProps<Subtask>> = ({ record: subtask, onSuccess 
         </View>
       </View>
 
-      <View style={[framework.flexRow, framework.alignCenter, framework.mx2]}>
-        <FontAwesome5 name="star" size={12} color={colors.warning} style={framework.mr1} />
-        <Text style={framework.textXs}>{subtask.points} pts</Text>
-      </View>
-
       <View style={[framework.flexRow, framework.alignCenter]}>
         <TouchableOpacity
           onPress={toggleImportance} style={framework.p1} hitSlop={10}

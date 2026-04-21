@@ -5,7 +5,6 @@ export type Goal = {
   name: string;
   description?: string;
   isImportant?: boolean;
-  points: number;
   deadline: string;
   status?: Status;
   priority?: number;
@@ -37,7 +36,6 @@ export type Task = {
   isCompleted: boolean;
   isImportant: boolean;
   categoryId?: number;
-  points: number,
   createdAt: string;
   updatedAt: string;
 };
@@ -48,7 +46,6 @@ export type Subtask = {
   id: number;
   title: string;
   isCompleted: boolean;
-  points: number,
   isImportant: boolean;
   parentTaskId: number;
 };
@@ -66,8 +63,6 @@ export type Habit = {
   title: string;
   description?: string;
   habitType: HabitType;
-  winPoints: number;
-  losePoints: number;
   repeatInterval?: RepeatInterval;
   customIntervalDays?: number;
   repeatWeekDay?: number,
@@ -99,8 +94,6 @@ export type Challenge = {
   id: number;
   title: string;
   description?: string;
-  points: number;
-  penaltyPoints: number;
   targetValue?: number;
   startDate: string;
   endDate: string;
@@ -121,7 +114,6 @@ export type TimerLog = {
   duration: string;
   type: string;
   description?: string;
-  points: number
 };
 
 export type SafeTimerLog = Omit<TimerLog, 'id'>;
