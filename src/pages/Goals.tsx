@@ -1,116 +1,87 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { FlatList, RefreshControl, View } from 'react-native';
-import { Goal, GoalWCategory } from '../types/schemas';
-import { findAllGoals } from '../api/crud/goals';
-import GoalCard from '../components/cards/Goal';
+import React, { useState } from 'react';
+import { Goal } from '../types/schemas';
 import Loading from './Loading';
 import EmptyContent from '../components/EmptyContent';
 import AddEditGoalModal from '../components/modals/AddEditGoal';
-import framework from '../styles/framework';
 import { defaultGoal } from '../constants/formValues';
-import { omit } from '../misc/helpers';
 import FloatingButton from '../components/FloatingButton';
-import Variables from '../styles/variables';
+import { useGetPaginatedGoals } from '../features/goals';
+import { useOffsetContext } from '../contexts/OffsetProvider';
+import { QueryKey } from '../types/variables';
+import PageHolder from '../layouts/PageHolder';
+import GoalsList from '../components/lists/Goals';
 
 const Goals: React.FC = (): React.JSX.Element => {
-  const [goals, setGoals] = useState<GoalWCategory[]>([]);
+  const key: QueryKey[] = ["goals"]
+  const { data, isLoading, isFetching, refetch, fetchNextPage, hasNextPage } = useGetPaginatedGoals({ limit: 5, key });
+  const goals = data?.pages?.flatMap(page => page.data) || [];
+
+  const { resetOffsetUnit } = useOffsetContext()
   const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
-  const [refreshing, setRefreshing] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
-  const fetchGoals = async () => {
-    try {
-      setIsLoading(true);
-      const data = await findAllGoals();
-      setGoals(data);
-    } catch (error) {
-      console.error('[GOALS] Failed to load goals:', error);
-    } finally {
-      setIsLoading(false);
-    }
+  const onRefetch = () => {
+    resetOffsetUnit(key)
+    refetch()
+  }
+
+  const handleAddGoal = () => {
+    setSelectedGoal(defaultGoal);
   };
 
-  const onRefresh = useCallback(async () => {
-    try {
-      setRefreshing(true);
-      const data = await findAllGoals();
-      setGoals(data);
-    } catch (e) {
-      console.error('[GOALS] refresh error', e);
-    } finally {
-      setRefreshing(false);
-    }
-  }, []);
-
-  const onEdit = (goal: GoalWCategory) => {
-    setSelectedGoal(omit(goal, ['categoryName', 'categoryColor']));
-  };
-
-  useEffect(() => {
-    fetchGoals();
-  }, []);
+  const handleCloseModel = () => {
+    setSelectedGoal(null);
+  }
 
   if (isLoading) return <Loading />;
 
   if (!goals.length) {
     return (
-      <>
+      <React.Fragment>
         <EmptyContent
           message="There are no goals yet"
           buttonText="Add your first goal"
-          onButtonPress={() => setSelectedGoal(defaultGoal)}
+          onButtonPress={handleAddGoal}
         />
+
         {selectedGoal && (
           <AddEditGoalModal
+            queryKey={key}
             visible
-            onClose={() => setSelectedGoal(null)}
-            onSave={fetchGoals}
+            onClose={handleCloseModel}
             initialGoal={selectedGoal}
           />
         )}
-      </>
+      </React.Fragment>
     );
   }
 
   return (
-    <View style={[framework.bgBackground, framework.flexOne]}>
-      <FlatList
-        data={goals}
-        keyExtractor={item => String(item.id)}
-        contentContainerStyle={[framework.py2]}
-        style={[framework.px2]}
-        renderItem={({ item }) => (
-          <GoalCard
-            record={item}
-            onEdit={() => onEdit(item)}
-            onSuccess={fetchGoals}
-          />
-        )}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={Variables.mainColor}
-          />
-        }
-      />
+    <PageHolder>
+      <GoalsList
+        items={goals}
+        setSelectedItem={setSelectedGoal}
+        isFetching={isFetching}
+        fetchNextPage={fetchNextPage}
+        onRefetch={onRefetch}
+        hasNextPage={hasNextPage}
+        queryKey={key} />
 
       {selectedGoal && (
         <AddEditGoalModal
+          queryKey={key}
           visible
-          onClose={() => setSelectedGoal(null)}
-          onSave={fetchGoals}
+          onClose={handleCloseModel}
           initialGoal={selectedGoal}
         />
       )}
 
       <FloatingButton
         msg='+ Add Goal'
-        action={() => setSelectedGoal(defaultGoal)}
+        action={handleAddGoal}
         right={8}
         bottom={8}
       />
-    </View>
+    </PageHolder>
   );
 };
 

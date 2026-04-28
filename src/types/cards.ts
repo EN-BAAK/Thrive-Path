@@ -1,7 +1,9 @@
+import { QueryKey } from "./variables";
+
 export type CardProps<T> = {
   record: T,
-  onSuccess?: () => void,
   onEdit?: () => void,
+  queryKey: QueryKey[]
 }
 
 export type SessionCardProps = {

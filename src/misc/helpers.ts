@@ -1,4 +1,4 @@
-export const booleanToNumber = (value: boolean): number => {
+export const booleanToNumber = (value: boolean | undefined): number => {
   return value ? 1 : 0;
 }
 
@@ -52,4 +52,8 @@ export const msToHMS = (ms: number) => {
 export const formatHMS = (ms: number) => {
   const { h, m, s } = msToHMS(ms);
   return `${zeroPad(h, 2, "0")}:${zeroPad(m, 2, "0")}:${zeroPad(s, 2, "0")}`;
+};
+
+export const wait = (ms: number): Promise<void> => {
+  return new Promise(resolve => setTimeout(resolve, ms));
 };

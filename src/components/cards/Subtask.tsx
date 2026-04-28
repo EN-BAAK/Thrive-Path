@@ -6,35 +6,25 @@ import framework from '../../styles/framework';
 import AntDesign from "react-native-vector-icons/AntDesign"
 import Variables from '../../styles/variables';
 import { Subtask } from '../../types/schemas';
-import { deleteSubtask, updateSubtaskCompletedById, updateSubtaskImportantById } from '../../api/crud/tasks';
 import { CardProps } from '../../types/cards';
+import { useRemoveSubtask, useUpdateSubtaskCompleted, useUpdateSubtaskImportance } from '../../features/subtasks';
 
-const SubtaskCard: React.FC<CardProps<Subtask>> = ({ record: subtask, onSuccess }) => {
+const SubtaskCard: React.FC<CardProps<Subtask>> = ({ record: subtask, queryKey: key }) => {
+  const { mutateAsync: deleteSubtaskAsync } = useRemoveSubtask({ key })
+  const { mutateAsync: updateSubtaskCompletedAsync } = useUpdateSubtaskCompleted({ key })
+  const { mutateAsync: updateSubtaskImportantAsync } = useUpdateSubtaskImportance({ key })
+
+
   const toggleCompleted = async () => {
-    try {
-      await updateSubtaskCompletedById(subtask.id, !subtask.isCompleted);
-      onSuccess?.();
-    } catch (e) {
-      console.log('[Subtask] toggleCompleted error', e);
-    }
+    await updateSubtaskCompletedAsync({ id: subtask.id, isCompleted: !subtask.isCompleted })
   };
 
   const toggleImportance = async () => {
-    try {
-      await updateSubtaskImportantById(subtask.id, !subtask.isImportant);
-      onSuccess?.();
-    } catch (e) {
-      console.log('[Subtask] toggleCompleted error', e);
-    }
+    await updateSubtaskImportantAsync({ id: subtask.id, isImportant: !subtask.isImportant })
   };
 
   const remove = async () => {
-    try {
-      await deleteSubtask(subtask.id);
-      onSuccess?.();
-    } catch (e) {
-      console.log('[Subtask] delete error', e);
-    }
+    await deleteSubtaskAsync(subtask.id)
   };
 
   return (
@@ -51,7 +41,7 @@ const SubtaskCard: React.FC<CardProps<Subtask>> = ({ record: subtask, onSuccess 
         <View style={framework.flexOne}>
           <Text
             style={[
-              framework.textSm,
+              framework.text, framework.textSm,
               subtask.isCompleted && styles.completed,
             ]}
             numberOfLines={1}

@@ -8,7 +8,6 @@ export const initializeDatabase = async () => {
   // await db.executeAsync(`DROP INDEX IF EXISTS idx_categories_name;`);
   // await db.executeAsync(`DROP INDEX IF EXISTS idx_tasks_title;`);
   // await db.executeAsync(`DROP INDEX IF EXISTS idx_subtasks_title;`);
-  // await db.executeAsync(`DROP INDEX IF EXISTS idx_habits_title;`);
   // await db.executeAsync(`DROP INDEX IF EXISTS idx_challenges_title;`);
   // await db.executeAsync(`DROP INDEX IF EXISTS idx_timer_logs_type;`);
 
@@ -16,7 +15,6 @@ export const initializeDatabase = async () => {
   // await db.executeAsync(`DROP TABLE IF EXISTS tasks;`);
   // await db.executeAsync(`DROP TABLE IF EXISTS subtasks;`);
   // await db.executeAsync(`DROP TABLE IF EXISTS categories;`);
-  // await db.executeAsync(`DROP TABLE IF EXISTS habits;`);
   // await db.executeAsync(`DROP TABLE IF EXISTS challenges;`);
   // await db.executeAsync(`DROP TABLE IF EXISTS timer_logs;`);
 
@@ -72,26 +70,6 @@ export const initializeDatabase = async () => {
   `);
 
   await db.executeAsync(`
-  CREATE TABLE IF NOT EXISTS habits (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL,
-    description TEXT,
-    habitType TEXT DEFAULT 'GOOD' NOT NULL,
-    repeatInterval TEXT DEFAULT 'DAILY',
-    customIntervalDays INTEGER,
-    repeatWeekDay INTEGER,
-    repeatMonthDay INTEGER,
-    deadline TEXT,
-    categoryId INTEGER,
-    goalId INTEGER,
-    createdAt TEXT DEFAULT (datetime('now')),
-    updatedAt TEXT DEFAULT (datetime('now')),
-    FOREIGN KEY (categoryId) REFERENCES categories(id) ON DELETE SET NULL,
-    FOREIGN KEY (goalId) REFERENCES goals(id) ON DELETE SET NULL
-  );
-`);
-
-  await db.executeAsync(`
   CREATE TABLE IF NOT EXISTS challenges (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
@@ -127,8 +105,6 @@ export const initializeDatabase = async () => {
 
   await db.executeAsync(`CREATE INDEX IF NOT EXISTS idx_tasks_title ON tasks(title);`);
   await db.executeAsync(`CREATE INDEX IF NOT EXISTS idx_subtasks_title ON subtasks(title);`);
-
-  await db.executeAsync(`CREATE INDEX IF NOT EXISTS idx_habits_title ON habits(title);`);
 
   await db.executeAsync(`CREATE INDEX IF NOT EXISTS idx_challenges_title ON challenges(title);`);
 

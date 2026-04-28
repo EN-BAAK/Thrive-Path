@@ -1,8 +1,7 @@
 import React from 'react';
-import { Modal, View, Text, TouchableOpacity, TouchableWithoutFeedback, KeyboardAvoidingView, ScrollView } from 'react-native';
+import { View } from 'react-native';
 import { Formik } from 'formik';
 import { SafeCategory } from '../../types/schemas';
-import { createCategory, updateCategory } from '../../api/crud/categories';
 import framework from '../../styles/framework';
 import InputField from '../forms/InputField';
 import { addEditCategoryValidation } from '../../constants/formValidation';
@@ -10,13 +9,13 @@ import { AddEditCategoryModalProps } from '../../types/modals';
 import ColorPickerField from '../forms/ColorPickerField';
 import IconPickerField from '../forms/IconPickerField';
 import Button from '../forms/Button';
+import { useCreateCategory, useUpdateCategory } from '../../features/categories';
+import CUModalHolder from '../../layouts/CUModalHolder';
 
-const AddEditCategoryModal: React.FC<AddEditCategoryModalProps> = ({
-  visible,
-  onClose,
-  onSave,
-  initialCategory,
-}) => {
+const AddEditCategoryModal: React.FC<AddEditCategoryModalProps> = ({ visible, onClose, initialCategory, queryKey: key }) => {
+  const { mutateAsync: createMutateAsync } = useCreateCategory({ key })
+  const { mutateAsync: updateMutateAsync } = useUpdateCategory({ key })
+
   const handleSubmitCategory = async (values: SafeCategory) => {
     try {
       const payload = {
@@ -26,11 +25,10 @@ const AddEditCategoryModal: React.FC<AddEditCategoryModalProps> = ({
       }
 
       if (payload.id === -1) {
-        await createCategory(payload);
+        await createMutateAsync(payload);
       } else {
-        await updateCategory(payload.id, payload);
+        await updateMutateAsync({ id: payload.id, updates: payload });
       }
-      onSave();
       onClose();
     } catch (error) {
       console.error('[AddEditCategoryModal] Failed to save category:', error);
@@ -38,67 +36,49 @@ const AddEditCategoryModal: React.FC<AddEditCategoryModalProps> = ({
   };
 
   return (
-    <Modal animationType="slide" transparent visible={visible}>
-      <TouchableOpacity
-        activeOpacity={1}
-        style={[framework.bgLayout, framework.flexOne, framework.justifyCenter, framework.px3]}
-        onPress={onClose}
+    <CUModalHolder onClose={onClose} title={initialCategory.id === -1 ? "Create Category" : "Edit Category"} visible={visible}>
+      <Formik<SafeCategory>
+        initialValues={initialCategory}
+        validationSchema={addEditCategoryValidation}
+        onSubmit={handleSubmitCategory}
+        enableReinitialize
       >
-        <KeyboardAvoidingView behavior='height' style={[framework.w100, framework.justifyCenter]}>
-          <TouchableWithoutFeedback>
-            <View style={[framework.bgBackground, framework.p4, framework.roundedMd, framework.shadowMedium]}>
-              <Text style={[framework.bgMain, framework.mb4, framework.py2, framework.px4, framework.roundedBottomMd, framework.textCenter, framework.fontBold, framework.textXl, framework.reversedText]}>
-                {initialCategory?.id === -1 ? 'Add New Category' : 'Edit Category'}
-              </Text>
+        {(formik) => (
+          <React.Fragment>
+            <InputField
+              name="name"
+              label="Name"
+              required
+              placeholder="Enter category name"
+              containerStyle={framework.mb2}
+            />
 
-              <ScrollView showsVerticalScrollIndicator={false}>
-                <Formik<SafeCategory>
-                  initialValues={initialCategory}
-                  validationSchema={addEditCategoryValidation}
-                  onSubmit={handleSubmitCategory}
-                  enableReinitialize
-                >
-                  {(formik) => (
-                    <>
-                      <InputField
-                        name="name"
-                        label="Name"
-                        required
-                        placeholder="Enter category name"
-                        containerStyle={framework.mb2}
-                      />
+            <ColorPickerField
+              name='color'
+              label='Color'
+              required
+              containerStyle={framework.mb4}
+            />
 
-                      <ColorPickerField
-                        name='color'
-                        label='Color'
-                        required
-                        containerStyle={framework.mb4}
-                      />
+            <IconPickerField
+              name='icon'
+              label='Icon'
+              required
+              containerStyle={framework.mb4}
+            />
 
-                      <IconPickerField
-                        name='icon'
-                        label='Icon'
-                        required
-                        containerStyle={framework.mb4}
-                      />
-
-                      <View style={[framework.flexRow, framework.justifyEnd]}>
-                        <Button
-                          msg='Save'
-                          onPress={() => formik.handleSubmit()}
-                          style={[framework.px5, framework.rounded]}
-                          disabled={!formik.dirty || formik.isSubmitting || !formik.isValid}
-                        />
-                      </View>
-                    </>
-                  )}
-                </Formik>
-              </ScrollView>
+            <View style={[framework.flexRow, framework.justifyEnd]}>
+              <Button
+                msg='Save'
+                onPress={() => formik.handleSubmit()}
+                style={[framework.px5, framework.rounded]}
+                disabled={!formik.dirty || formik.isSubmitting || !formik.isValid}
+              />
             </View>
-          </TouchableWithoutFeedback>
-        </KeyboardAvoidingView>
-      </TouchableOpacity>
-    </Modal>
+          </React.Fragment>
+        )}
+      </Formik>
+    </CUModalHolder>
   );
 };
 

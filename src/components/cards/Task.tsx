@@ -9,57 +9,73 @@ import colors from '../../styles/colors';
 import Variables from '../../styles/variables';
 import { CardProps } from '../../types/cards';
 import { TaskWithCategoryAndSubtasks } from '../../types/schemas';
-import { deleteTask, updateTaskIsCompletedById, updateTaskImportantById } from '../../api/crud/tasks';
 import { formatDate } from '../../misc/helpers';
 import SubtaskCard from './Subtask';
 import AddSubtaskModal from '../modals/AddSubtask';
 import Button from '../forms/Button';
+import { Menu } from 'react-native-paper';
+import { useDeleteTask, useUpdateCompletingTask, useUpdateIsImportantTask } from '../../features/tasks';
+import { useAppContext } from '../../contexts/AppProvider';
 
-const TaskCard: React.FC<CardProps<TaskWithCategoryAndSubtasks>> = ({ record: task, onEdit, onSuccess }) => {
-  const [menuOpen, setMenuOpen] = useState(false);
+const statusColors: Record<NonNullable<string>, string> = {
+  "completed": colors.success,
+  "uncompleted": colors.warning,
+};
+
+const TaskCard: React.FC<CardProps<TaskWithCategoryAndSubtasks>> = ({ record: task, onEdit, queryKey: key }) => {
   const [isAddSubtaskModalVisible, setIsAddSubtaskModalVisible] = useState<boolean>(false)
-  const [open, setOpen] = useState(false);
+  const [actionMenuVisible, setActionMenuVisible] = useState(false);
+  const [isAccordionOpened, setIsAccordionOpened] = useState(false);
 
-  const toggleCompleted = async () => {
-    try {
-      await updateTaskIsCompletedById(task.id, !task.isCompleted);
-      onSuccess?.();
-    } catch (e) {
-      console.log('[Task] toggleCompleted error', e);
-    }
-  };
+  const { showWarning } = useAppContext()
 
-  const toggleImportant = async () => {
-    try {
-      await updateTaskImportantById(task.id, !task.isImportant);
-      onSuccess?.();
-    } catch (e) {
-      console.log('[Task] toggleImportant error', e);
-    }
-  };
+  const { mutateAsync: isImportantUpdatingMutateAsync } = useUpdateIsImportantTask({ key })
+  const { mutateAsync: isCompletedUpdatingMutateAsync } = useUpdateCompletingTask({ key })
+  const { mutateAsync: deleteMutateAsync } = useDeleteTask({ key })
 
-  const handleDelete = async () => {
-    try {
-      await deleteTask(task.id);
-      onSuccess?.();
-    } catch (e) {
-      console.log('[Task] delete error', e);
-    } finally {
-      setMenuOpen(false);
-    }
-  };
+  const statusColor = statusColors[task.isCompleted ? "completed" : "uncompleted"]
+
+  const onActionMenuClose = () => {
+    setActionMenuVisible(false)
+  }
+
+  const onActionMenuOpen = () => {
+    setActionMenuVisible(true)
+  }
 
   const toggleAccordion = () => {
-    setOpen((v) => !v);
+    setIsAccordionOpened((v) => !v);
   };
 
   const handleAddSubtask = () => {
     setIsAddSubtaskModalVisible(true)
   };
 
+  const handleDelete = async () => {
+    showWarning({
+      btn2: "delete",
+      btn1: "cancel",
+      handleBtn2: async () => await deleteMutateAsync(task.id),
+      message: `Are you sure you want to delete the task "${task.title}"?`
+    })
+  };
+
+  const handleIsImportantToggle = async () => {
+    isImportantUpdatingMutateAsync({ id: task.id, isImportant: !task.isImportant })
+  }
+
+  const handleCompleteToggle = async () => {
+    isCompletedUpdatingMutateAsync({ id: task.id, isCompleted: !task.isCompleted })
+  }
+
+  const handleEdit = () => {
+    onActionMenuClose()
+    onEdit && onEdit()
+  }
+
   return (
     <View style={[framework.card, framework.bgBackground, framework.mb2, framework.p0, framework.relative, framework.indexBehind, framework.overflowHidden]}>
-      <View style={[styles.strip, framework.h100, framework.absolute, framework.top0, framework.left0, framework.index1, { backgroundColor: task.categoryColor }]} />
+      <View style={[styles.strip, framework.h100, framework.absolute, framework.top0, framework.left0, framework.index1, { backgroundColor: statusColor }]} />
 
       <LinearGradient
         colors={[task.categoryColor, `${task.categoryColor}99`]}
@@ -68,11 +84,11 @@ const TaskCard: React.FC<CardProps<TaskWithCategoryAndSubtasks>> = ({ record: ta
         <View style={[framework.flexOne, framework.flexRow, framework.alignCenter, framework.gap2]}>
           <View style={[framework.flexOne]}>
             <View style={[framework.flexRow, framework.alignCenter]}>
-              <TouchableOpacity onPress={toggleCompleted} style={framework.p1} hitSlop={10}>
+              <TouchableOpacity onPress={handleCompleteToggle} style={framework.p1} hitSlop={10}>
                 <FontAwesome5
                   name={task.isCompleted ? 'check-circle' : 'circle'}
                   size={18}
-                  color={task.isCompleted ? colors.success : Variables.reversedTextColor}
+                  color={Variables.reversedTextColor}
                 />
               </TouchableOpacity>
 
@@ -83,7 +99,7 @@ const TaskCard: React.FC<CardProps<TaskWithCategoryAndSubtasks>> = ({ record: ta
               </Text>
 
               <View style={[framework.flexRow, framework.alignCenter, framework.relative, framework.index1]}>
-                <TouchableOpacity onPress={toggleImportant} style={framework.p1} hitSlop={10}>
+                <TouchableOpacity onPress={handleIsImportantToggle} style={framework.p1} hitSlop={10}>
                   <AntDesign
                     name={task.isImportant ? 'star' : 'staro'}
                     size={16}
@@ -91,20 +107,25 @@ const TaskCard: React.FC<CardProps<TaskWithCategoryAndSubtasks>> = ({ record: ta
                   />
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => setMenuOpen((v) => !v)} style={framework.p1} hitSlop={10}>
-                  <FontAwesome5 name="ellipsis-v" size={16} color={Variables.reversedTextColor} />
-                </TouchableOpacity>
-
-                {menuOpen && (
-                  <View style={[framework.bgLight, framework.rounded, framework.shadowLight, framework.absolute, framework.top0, framework.right4, framework.overflowHidden]}>
-                    <TouchableOpacity onPress={onEdit} style={[styles.menuItem, framework.py2, framework.px4]}>
-                      <Text style={framework.text}>Edit</Text>
+                <Menu
+                  anchor={
+                    <TouchableOpacity onPress={onActionMenuOpen} hitSlop={10}>
+                      <FontAwesome5 name="ellipsis-v" size={16} color={Variables.reversedTextColor} />
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={handleDelete} style={[styles.menuItem, framework.py2, framework.px4]}>
-                      <Text style={framework.text}>Delete</Text>
+                  }
+                  visible={actionMenuVisible}
+                  onDismiss={onActionMenuClose}
+                  contentStyle={[framework.bgBackground]}
+                >
+                  <View>
+                    <TouchableOpacity onPress={handleEdit} style={[framework.py2, framework.px4, framework.borderBottom]}>
+                      <Text style={[framework.text]}>Edit</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={handleDelete} style={[framework.py2, framework.px4]}>
+                      <Text style={[framework.text]}>Delete</Text>
                     </TouchableOpacity>
                   </View>
-                )}
+                </Menu>
               </View>
             </View>
 
@@ -131,20 +152,20 @@ const TaskCard: React.FC<CardProps<TaskWithCategoryAndSubtasks>> = ({ record: ta
           onPress={toggleAccordion}
           style={[styles.metaPill, framework.py1, framework.px3, framework.flexRow, framework.alignCenter, framework.roundedPill, framework.gap1]}
         >
-          <FontAwesome5 name={open ? 'chevron-up' : 'chevron-down'} size={12} color={colors.text} />
+          <FontAwesome5 name={isAccordionOpened ? 'chevron-up' : 'chevron-down'} size={12} color={colors.text} />
           <Text style={[framework.textXs, framework.ml1m, framework.text]}>
-            {open ? 'Hide subtasks' : `Show subtasks (${task.subtasks?.length || 0})`}
+            {isAccordionOpened ? 'Hide subtasks' : `Show subtasks (${task.subtasks?.length || 0})`}
           </Text>
         </TouchableOpacity>
       </View>
 
-      {open && (
+      {isAccordionOpened && (
         <View style={[framework.p3, framework.pt2, framework.gap2]}>
           {(task.subtasks?.length || 0) === 0 ? (
             <Text style={[framework.textSm, framework.textMuted]}>No subtasks</Text>
           ) : (
             task.subtasks!.map((st) => (
-              <SubtaskCard key={st.id} record={st} onSuccess={onSuccess} />
+              <SubtaskCard key={`sub-task-${st.id}`} record={st} queryKey={key} />
             ))
           )}
 
@@ -159,8 +180,8 @@ const TaskCard: React.FC<CardProps<TaskWithCategoryAndSubtasks>> = ({ record: ta
       <AddSubtaskModal
         visible={isAddSubtaskModalVisible}
         onClose={() => setIsAddSubtaskModalVisible(false)}
-        onSave={() => onSuccess?.()}
         parentTaskId={task.id}
+        queryKey={key}
       />
     </View>
   );

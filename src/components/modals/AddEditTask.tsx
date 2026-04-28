@@ -1,13 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import {
-  Modal,
-  View,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  KeyboardAvoidingView,
-  ScrollView,
-} from 'react-native';
+import React from 'react';
+import { View, } from 'react-native';
 import { Formik } from 'formik';
 import framework from '../../styles/framework';
 import colors from '../../styles/colors';
@@ -15,35 +7,18 @@ import Variables from '../../styles/variables';
 import InputField from '../forms/InputField';
 import SwitchField from '../forms/SwitchField';
 import SelectField from '../forms/SelectField';
-import { Category, SafeTask, Task } from '../../types/schemas';
-import { getCategories } from '../../api/crud/categories';
-import { createTask, updateTask } from '../../api/crud/tasks';
+import { SafeTask, Task } from '../../types/schemas';
 import { addEditTaskValidation } from '../../constants/formValidation';
 import { AddEditTaskModalProps } from '../../types/modals';
 import Button from '../forms/Button';
+import { useCreateTask, useUpdateTask } from '../../features/tasks';
+import CUModalHolder from '../../layouts/CUModalHolder';
+import { useGetCategories } from '../../features/categories';
 
-const AddEditTaskModal: React.FC<AddEditTaskModalProps> = ({
-  visible,
-  onClose,
-  onSave,
-  initialTask,
-}) => {
-  const [categories, setCategories] = useState<Category[]>([]);
-
-  const fetchCategories = async () => {
-    try {
-      const cats = await getCategories();
-      setCategories(cats);
-    } catch (error) {
-      console.error('[AddEditTaskModal] Error fetching categories:', error);
-    }
-  };
-
-  useEffect(() => {
-    if (visible) {
-      fetchCategories();
-    }
-  }, [visible]);
+const AddEditTaskModal: React.FC<AddEditTaskModalProps> = ({ visible, onClose, initialTask, queryKey: key }) => {
+  const { data: categories = [] } = useGetCategories({ key: ["categories"], enabled: visible });
+  const { mutateAsync: createMutate } = useCreateTask({ key })
+  const { mutateAsync: updateMutate } = useUpdateTask({ key })
 
   const handleSubmitTask = async (values: SafeTask) => {
     try {
@@ -56,12 +31,11 @@ const AddEditTaskModal: React.FC<AddEditTaskModalProps> = ({
       };
 
       if (payload.id === -1) {
-        await createTask(payload);
+        await createMutate(payload);
       } else {
-        await updateTask(payload.id, payload);
+        await updateMutate({ id: payload.id, updates: payload });
       }
 
-      onSave();
       onClose();
     } catch (error) {
       console.error('[AddEditTaskModal] Failed to save task:', error);
@@ -69,89 +43,74 @@ const AddEditTaskModal: React.FC<AddEditTaskModalProps> = ({
   };
 
   return (
-    <Modal animationType="slide" transparent visible={visible}>
-      <TouchableOpacity
-        activeOpacity={1}
-        style={[framework.bgLayout, framework.flexOne, framework.justifyCenter, framework.px3]}
-        onPress={onClose}
+    <CUModalHolder
+      onClose={onClose}
+      title={initialTask.id === -1 ? "Create task" : "Edit task"}
+      visible={visible}
+    >
+      <Formik<SafeTask>
+        initialValues={initialTask}
+        validationSchema={addEditTaskValidation}
+        onSubmit={handleSubmitTask}
+        enableReinitialize
       >
-        <KeyboardAvoidingView behavior="height" style={[framework.w100, framework.justifyCenter]} keyboardVerticalOffset={0}>
-          <TouchableWithoutFeedback>
-            <View style={[framework.bgBackground, framework.p4, framework.roundedMd, framework.shadowMedium]}>
-              <Text style={[framework.bgMain, framework.mb4, framework.py2, framework.px4, framework.roundedBottomMd, framework.textCenter, framework.fontBold, framework.textXl, framework.reversedText]}
-              >
-                {initialTask?.id === -1 ? 'Add New Task' : 'Edit Task'}
-              </Text>
+        {(formik) => (
+          <React.Fragment>
+            <InputField
+              name="title"
+              label="Title"
+              required
+              placeholder="Enter task title"
+              containerStyle={framework.mb2}
+            />
 
-              <ScrollView showsVerticalScrollIndicator={false}>
-                <Formik<SafeTask>
-                  initialValues={initialTask}
-                  validationSchema={addEditTaskValidation}
-                  onSubmit={handleSubmitTask}
-                  enableReinitialize
-                >
-                  {(formik) => (
-                    <>
-                      <InputField
-                        name="title"
-                        label="Title"
-                        required
-                        placeholder="Enter task title"
-                        containerStyle={framework.mb2}
-                      />
+            <InputField
+              name="description"
+              label="Description"
+              placeholder="Enter task description"
+              containerStyle={framework.mb2}
+              multiLine
+            />
 
-                      <InputField
-                        name="description"
-                        label="Description"
-                        placeholder="Enter task description"
-                        containerStyle={framework.mb2}
-                        multiLine
-                      />
+            <SwitchField
+              name="isImportant"
+              label="Important?"
+              containerStyle={framework.mb2}
+              trackColor={{ true: Variables.lightMain, false: Variables.secondaryColor }}
+              thumbColor={{ true: Variables.mainColor, false: colors.gray }}
+            />
 
-                      <SwitchField
-                        name="isImportant"
-                        label="Important?"
-                        containerStyle={framework.mb2}
-                        trackColor={{ true: Variables.lightMain, false: Variables.secondaryColor }}
-                        thumbColor={{ true: Variables.mainColor, false: colors.gray }}
-                      />
+            <SwitchField
+              name="isCompleted"
+              label="Completed?"
+              containerStyle={framework.mb2}
+              trackColor={{ true: colors.success, false: Variables.secondaryColor }}
+              thumbColor={{ true: colors.success, false: colors.gray }}
+            />
 
-                      <SwitchField
-                        name="isCompleted"
-                        label="Completed?"
-                        containerStyle={framework.mb2}
-                        trackColor={{ true: colors.success, false: Variables.secondaryColor }}
-                        thumbColor={{ true: colors.success, false: colors.gray }}
-                      />
+            <SelectField
+              name="categoryId"
+              label="Category"
+              placeholder="Select a category"
+              options={categories.map(c => ({
+                label: c.name,
+                value: c.id,
+              }))}
+              containerStyle={framework.mb3}
+            />
 
-                      <SelectField
-                        name="categoryId"
-                        label="Category"
-                        placeholder="Select a category"
-                        options={categories.map(c => ({
-                          label: c.name,
-                          value: c.id,
-                        }))}
-                        containerStyle={framework.mb3}
-                      />
-
-                      <View style={[framework.flexRow, framework.justifyEnd]}>
-                        <Button
-                          msg='Save'
-                          onPress={() => formik.handleSubmit()}
-                          style={[framework.px5, framework.rounded]}
-                          disabled={!formik.dirty || formik.isSubmitting || !formik.isValid}
-                        />
-                      </View>
-                    </>
-                  )}
-                </Formik>
-              </ScrollView>
+            <View style={[framework.flexRow, framework.justifyEnd]}>
+              <Button
+                msg='Save'
+                onPress={() => formik.handleSubmit()}
+                style={[framework.px5, framework.rounded]}
+                disabled={!formik.dirty || formik.isSubmitting || !formik.isValid}
+              />
             </View>
-          </TouchableWithoutFeedback>
-        </KeyboardAvoidingView>
-      </TouchableOpacity>
-    </Modal>
+          </React.Fragment>
+        )}
+      </Formik>
+    </CUModalHolder>
   );
 };
 

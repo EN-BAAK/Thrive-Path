@@ -1,61 +1,40 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { View, FlatList, RefreshControl } from 'react-native';
-import { TaskWithCategoryAndSubtasks, Task } from '../types/schemas';
+import React, { useState } from 'react';
+import { View } from 'react-native';
+import { Task } from '../types/schemas';
 import framework from '../styles/framework';
 import Loading from './Loading';
 import EmptyContent from '../components/EmptyContent';
-import TaskCard from '../components/cards/Task';
-import { findAllTasks } from '../api/crud/tasks';
 import AddEditTaskModal from '../components/modals/AddEditTask';
 import { defaultTask } from '../constants/formValues';
-import { omit } from '../misc/helpers';
 import FloatingButton from '../components/FloatingButton';
-import Variables from '../styles/variables';
+import PageHolder from '../layouts/PageHolder';
+import { QueryKey } from '../types/variables';
+import { useGetPaginatedTasks } from '../features/tasks';
+import { useOffsetContext } from '../contexts/OffsetProvider';
+import TasksList from '../components/lists/Tasks';
 
 const Tasks: React.FC = (): React.JSX.Element => {
-  const [tasks, setTasks] = useState<TaskWithCategoryAndSubtasks[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
+  const key: QueryKey[] = ["tasks"]
+  const { data, isLoading, isFetching, refetch, fetchNextPage, hasNextPage } = useGetPaginatedTasks({ limit: 20, key });
+  const tasks = data?.pages?.flatMap(page => page.data) || [];
+
+  const { resetOffsetUnit } = useOffsetContext()
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
-  const load = async () => {
-    try {
-      setLoading(true);
-      const data = await findAllTasks();
-      setTasks(data);
-    } catch (e) {
-      console.error('[TASKS] load error', e);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const onRefresh = useCallback(async () => {
-    try {
-      setRefreshing(true);
-      const data = await findAllTasks();
-      setTasks(data);
-    } catch (e) {
-      console.error('[TASKS] refresh error', e);
-    } finally {
-      setRefreshing(false);
-    }
-  }, []);
+  const onRefetch = () => {
+    resetOffsetUnit(key)
+    refetch()
+  }
 
   const handleAddTask = () => {
     setSelectedTask(defaultTask);
   };
 
-  const onEdit = (task: TaskWithCategoryAndSubtasks) => {
-    setSelectedTask(omit(task, ['categoryName', 'categoryColor', "subtasks"]));
-  };
+    const handleCloseModel = () => {
+    setSelectedTask(null);
+  }
 
-  useEffect(() => {
-    load();
-  }, []);
-
-
-  if (loading) return <Loading />;
+  if (isLoading) return <Loading />;
 
   if (!tasks.length) {
     return (
@@ -69,9 +48,9 @@ const Tasks: React.FC = (): React.JSX.Element => {
         {selectedTask && (
           <AddEditTaskModal
             visible
-            onClose={() => setSelectedTask(null)}
-            onSave={load}
+            onClose={handleCloseModel}
             initialTask={selectedTask}
+            queryKey={key}
           />
         )}
       </View>
@@ -79,34 +58,22 @@ const Tasks: React.FC = (): React.JSX.Element => {
   }
 
   return (
-    <View style={[framework.bgBackground, framework.flexOne]}>
-      <FlatList
-        data={tasks}
-        keyExtractor={(item) => String(item.id)}
-        contentContainerStyle={[framework.py2]}
-        style={[framework.px2]}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={Variables.mainColor}
-          />
-        }
-        renderItem={({ item }) => (
-          <TaskCard
-            record={item}
-            onEdit={() => onEdit(item)}
-            onSuccess={load}
-          />
-        )}
-      />
+    <PageHolder>
+      <TasksList
+        items={tasks}
+        setSelectedItem={setSelectedTask}
+        isFetching={isFetching}
+        fetchNextPage={fetchNextPage}
+        onRefetch={onRefetch}
+        hasNextPage={hasNextPage}
+        queryKey={key} />
 
       {selectedTask && (
         <AddEditTaskModal
           visible
-          onClose={() => setSelectedTask(null)}
-          onSave={load}
+          onClose={handleCloseModel}
           initialTask={selectedTask}
+          queryKey={key}
         />
       )}
 
@@ -116,7 +83,7 @@ const Tasks: React.FC = (): React.JSX.Element => {
         right={8}
         bottom={8}
       />
-    </View>
+    </PageHolder>
   );
 };
 

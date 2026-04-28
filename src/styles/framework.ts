@@ -73,6 +73,10 @@ const spacing: NamedStyles<any> = {
   my4: { marginVertical: 16 },
   my5: { marginVertical: 20 },
 
+  mtAuto: { marginTop: "auto" },
+  myAuto: { marginVertical: "auto" },
+  mxAuto: { marginHorizontal: "auto" },
+
   p0: { padding: 0 },
   p1: { padding: 4 },
   p2: { padding: 8 },

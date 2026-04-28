@@ -1,4 +1,10 @@
+import { InfiniteData } from "@tanstack/react-query";
 import { TextStyle, ViewStyle } from "react-native";
+
+export enum ToastMessageType {
+  SUCCESS = "SUCCESS",
+  FAILED = "FAILED",
+}
 
 export type Operation = '=' | '!=' | '<' | '<=' | '>' | '>=' | 'LIKE' | 'IN' | "IS";
 type JoinTypes = 'INNER' | 'LEFT' | 'RIGHT' | 'FULL';
@@ -7,15 +13,34 @@ export enum Status {
   COMPLETED = "COMPLETED",
   CANCELED = "CANCELED"
 }
-export enum HabitType {
-  GOOD = "GOOD",
-  BAD = "BAD"
-}
+
 export enum RepeatInterval {
   DAILY = "DAILY",
   WEEKLY = "WEEKLY",
   MONTHLY = "MONTHLY",
   CUSTOM = "CUSTOM"
+}
+
+export type ToastMessage = {
+  message: string;
+  type: ToastMessageType;
+  title?: string
+};
+
+export type Warning = {
+  message: string;
+  btn1?: string;
+  btn2: string;
+  handleBtn2: () => void;
+  handleBtn1?: () => void
+};
+
+export type QueryKey = string | number
+
+export type OffsetUnit = Record<QueryKey, any>
+export enum UpdateOffsetUnitProcess {
+  UP = "UP",
+  DOWN = "DOWN"
 }
 
 export interface Condition {
@@ -24,6 +49,21 @@ export interface Condition {
   operator?: Operation
   value: any;
 }
+
+export type PaginatedResult<T> = {
+  data: T[];
+  count: number;
+  limit: number;
+  page: number;
+  totalPages: number;
+  hasMore: boolean;
+  hasPrevious: boolean;
+  nextPage: number | null;
+  prevPage: number | null;
+};
+
+export type InfiniteAPIResponse<T> =
+  InfiniteData<PaginatedResult<T>>;
 
 export type NamedStyles<T> = { [P in keyof T]: ViewStyle | TextStyle };
 
@@ -47,7 +87,8 @@ export type SelectOption = {
 
 export type Pagination = {
   limit?: number,
-  offset?: number
+  offsetUnit?: number
+  page?: number
 }
 
 export type ThemeColors = {

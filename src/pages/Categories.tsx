@@ -1,7 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { View } from 'react-native';
+import React, { useState } from 'react';
 import { Category as CategoryType } from '../types/schemas';
-import { getCategories } from '../api/crud/categories';
 import Loading from './Loading';
 import EmptyContent from '../components/EmptyContent';
 import framework from '../styles/framework';
@@ -12,46 +10,21 @@ import FloatingButton from '../components/FloatingButton';
 import { FlatList } from 'react-native-gesture-handler';
 import { RefreshControl } from 'react-native';
 import Variables from '../styles/variables';
+import { useGetCategories } from '../features/categories';
+import { QueryKey } from '../types/variables';
+import PageHolder from '../layouts/PageHolder';
 
 const Categories: React.FC = (): React.JSX.Element => {
-  const [categories, setCategories] = useState<CategoryType[]>([]);
+  const key: QueryKey[] = ["categories"]
+  const { data: categories = [], isLoading, isFetching, refetch } = useGetCategories({ key })
+
   const [selectedCategory, setSelectedCategory] = useState<CategoryType | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-
-  const fetchCategories = async () => {
-    try {
-      setIsLoading(true);
-      const data = await getCategories();
-      setCategories(data);
-    } catch (error) {
-      console.error('[CATEGORIES] Failed to load categories:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const onRefresh = useCallback(async () => {
-    try {
-      setRefreshing(true);
-      const data = await getCategories();
-      setCategories(data);
-    } catch (e) {
-      console.error('[CATEGORIES] refresh error', e);
-    } finally {
-      setRefreshing(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchCategories();
-  }, []);
 
   if (isLoading) return <Loading />;
 
   if (!categories.length) {
     return (
-      <>
+      <React.Fragment>
         <EmptyContent
           message="There are no categories yet"
           buttonText="Add your first category"
@@ -61,16 +34,16 @@ const Categories: React.FC = (): React.JSX.Element => {
           <AddEditCategoryModal
             visible
             onClose={() => setSelectedCategory(null)}
-            onSave={fetchCategories}
+            queryKey={key}
             initialCategory={selectedCategory}
           />
         )}
-      </>
+      </React.Fragment>
     );
   }
 
   return (
-    <View style={[framework.bgBackground, framework.flexOne]}>
+    <PageHolder>
       <FlatList
         data={categories}
         keyExtractor={(item) => String(item.id)}
@@ -78,16 +51,17 @@ const Categories: React.FC = (): React.JSX.Element => {
         style={[framework.px2]}
         refreshControl={
           <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
+            refreshing={isFetching}
+            onRefresh={refetch}
             tintColor={Variables.mainColor}
           />
+          
         }
         renderItem={({ item }) => (
           <CategoryCard
             record={item}
             onEdit={() => setSelectedCategory(item)}
-            onSuccess={fetchCategories}
+            queryKey={key}
           />
         )}
       />
@@ -96,7 +70,7 @@ const Categories: React.FC = (): React.JSX.Element => {
         <AddEditCategoryModal
           visible
           onClose={() => setSelectedCategory(null)}
-          onSave={fetchCategories}
+          queryKey={key}
           initialCategory={selectedCategory}
         />
       )}
@@ -107,7 +81,7 @@ const Categories: React.FC = (): React.JSX.Element => {
         right={8}
         bottom={8}
       />
-    </View>
+    </PageHolder>
   );
 };
 

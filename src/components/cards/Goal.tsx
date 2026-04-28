@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import AntDesign from "react-native-vector-icons/AntDesign"
@@ -8,9 +8,12 @@ import { GoalWCategory } from '../../types/schemas';
 import { formatDate } from '../../misc/helpers';
 import colors from '../../styles/colors';
 import framework from '../../styles/framework';
-import { deleteGoal, updateGoalStatusById, updateIsImportantById } from '../../api/crud/goals';
 import Variables from '../../styles/variables';
 import { Status } from '../../types/variables';
+import { useDeleteGoal, useUpdateIsImportantGoal, useUpdateStatusGoal } from '../../features/goals';
+import { Menu } from "react-native-paper"
+import ModalHolder from '../../layouts/ModalHolder';
+import { useAppContext } from '../../contexts/AppProvider';
 
 const statusColors: Record<NonNullable<GoalWCategory['status']>, string> = {
   PENDING: colors.warning,
@@ -19,44 +22,60 @@ const statusColors: Record<NonNullable<GoalWCategory['status']>, string> = {
 };
 const statusList = [Status.PENDING, Status.COMPLETED, Status.CANCELED];
 
-const GoalCard: React.FC<CardProps<GoalWCategory>> = ({ record: goal, onEdit, onSuccess }) => {
-  const [menuVisible, setMenuVisible] = useState(false);
+const GoalCard: React.FC<CardProps<GoalWCategory>> = ({ record: goal, onEdit, queryKey: key }) => {
+  const [actionMenuVisible, setActionMenuVisible] = useState(false);
   const [statusMenuVisible, setStatusMenuVisible] = useState(false);
+
+  const { showWarning } = useAppContext()
+
+  const { mutateAsync: deleteMutateAsync } = useDeleteGoal({ key })
+  const { mutateAsync: isImportantUpdatingMutateAsync } = useUpdateIsImportantGoal({ key })
+  const { mutateAsync: statusUpdatingMutateAsync } = useUpdateStatusGoal({ key })
 
   const statusColor = goal.status ? statusColors[goal.status] : colors.secondary;
 
+  const onActionMenuClose = () => {
+    setActionMenuVisible(false)
+  }
+
+  const onActionMenuOpen = () => {
+    setActionMenuVisible(true)
+  }
+
+  const onStatusMenuClose = () => {
+    setStatusMenuVisible(false)
+  }
+
+  const onStatusMenuOpen = () => {
+    setStatusMenuVisible(true)
+  }
+
   const handleDelete = async () => {
-    try {
-      await deleteGoal(goal.id);
-      onSuccess?.();
-    } catch {
-      console.log('[Goal] Failed to delete the goal');
-    } finally {
-      setMenuVisible(false);
-    }
-  };
+    showWarning({
+      btn2: "delete",
+      btn1: "cancel",
+      handleBtn2: async () => await deleteMutateAsync(goal.id),
+      message: `Are you sure you want to delete the goal "${goal.name}"?`
+    })
+  }
 
   const handleIsImportantToggle = async () => {
-    try {
-      await updateIsImportantById(goal.id, !goal.isImportant)
-      onSuccess?.()
-    } catch {
-      console.log('[Goal] Failed to update the goal important status');
-    }
+    isImportantUpdatingMutateAsync({ id: goal.id, isImportant: !goal.isImportant })
   }
 
   const handleChangeStatus = async (status: Status) => {
-    try {
-      await updateGoalStatusById(goal.id, status)
-      onSuccess?.()
-    } catch {
-      console.log('[Goal] Failed to update the goal status');
-    }
+    statusUpdatingMutateAsync({ id: goal.id, status })
+    onStatusMenuClose()
+  }
+
+  const handleEdit = () => {
+    onActionMenuClose()
+    onEdit && onEdit()
   }
 
   return (
     <View style={[framework.card, framework.bgBackground, framework.p0, framework.overflowHidden]}>
-      <View style={[styles.categoryBar, framework.h100, framework.absolute, framework.top0, framework.left0, { backgroundColor: goal.categoryColor }]} />
+      <View style={[styles.categoryBar, framework.h100, framework.absolute, framework.top0, framework.left0, { backgroundColor: statusColor }]} />
 
       <LinearGradient
         colors={[goal.categoryColor, `${goal.categoryColor}99`]}
@@ -77,27 +96,32 @@ const GoalCard: React.FC<CardProps<GoalWCategory>> = ({ record: goal, onEdit, on
               />
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => setMenuVisible(prev => !prev)} hitSlop={10}>
-              <FontAwesome5 name="ellipsis-v" size={16} color={Variables.reversedTextColor} />
-            </TouchableOpacity>
-
-            {menuVisible && (
-              <View style={[framework.bgLight, framework.rounded, framework.shadowLight, framework.absolute, framework.top0, framework.right4, framework.overflowHidden]}>
-                <TouchableOpacity onPress={onEdit} style={[styles.menuItem, framework.py2, framework.px4]}>
+            <Menu
+              anchor={
+                <TouchableOpacity onPress={onActionMenuOpen} hitSlop={10}>
+                  <FontAwesome5 name="ellipsis-v" size={16} color={Variables.reversedTextColor} />
+                </TouchableOpacity>
+              }
+              visible={actionMenuVisible}
+              onDismiss={onActionMenuClose}
+              contentStyle={[framework.bgBackground]}
+            >
+              <View>
+                <TouchableOpacity onPress={handleEdit} style={[framework.py2, framework.px4, framework.borderBottom]}>
                   <Text style={[framework.text]}>Edit</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={handleDelete} style={[styles.menuItem, framework.py2, framework.px4]}>
+                <TouchableOpacity onPress={handleDelete} style={[framework.py2, framework.px4]}>
                   <Text style={[framework.text]}>Delete</Text>
                 </TouchableOpacity>
               </View>
-            )}
+            </Menu>
           </View>
-
         </View>
+
         <Text style={[framework.mt1, framework.textSm, framework.reversedText]}>
           {goal.categoryName}
         </Text>
-      </LinearGradient>
+      </LinearGradient >
 
       <View style={[framework.p3, framework.pt2]}>
         {goal.description && (
@@ -114,39 +138,26 @@ const GoalCard: React.FC<CardProps<GoalWCategory>> = ({ record: goal, onEdit, on
 
           {goal.status && (
             <TouchableOpacity
-              onPress={() => setStatusMenuVisible(true)}
+              onPress={onStatusMenuOpen}
               style={[styles.statusBadge, framework.py1, framework.px3, framework.roundedPill, { backgroundColor: statusColor }]}
             >
               <Text style={[framework.textSm, framework.reversedText]}>{goal.status}</Text>
             </TouchableOpacity>
           )}
 
-          <Modal
-            visible={statusMenuVisible}
-            transparent
-            animationType="fade"
-            onRequestClose={() => setStatusMenuVisible(false)}
-          >
-            <TouchableOpacity
-              style={[framework.bgLayout, framework.flexOne, framework.flexCenter]}
-              activeOpacity={1}
-              onPressOut={() => setStatusMenuVisible(false)}
-            >
-              <View style={[styles.statusMenu, framework.bgBackground, framework.py2, framework.rounded, framework.shadowStrong]}>
-                {statusList.map((status) => (
-                  <TouchableOpacity
-                    key={status}
-                    style={[framework.py3, framework.px5, status === goal.status && framework.bgLightMain]}
-                    onPress={() => handleChangeStatus(status)}
-                  >
-                    <Text style={[framework.text]}>
-                      {status}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </TouchableOpacity>
-          </Modal>
+          <ModalHolder visible={statusMenuVisible} onClose={onStatusMenuClose} title='Status:'>
+            {statusList.map((status) => (
+              <TouchableOpacity
+                key={status}
+                style={[framework.py3, framework.px5, framework.rounded, status === goal.status && framework.bgLightMain]}
+                onPress={() => handleChangeStatus(status)}
+              >
+                <Text style={[framework.text, status === goal.status && framework.fontBold]}>
+                  {status}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ModalHolder>
         </View>
       </View>
 
@@ -155,7 +166,7 @@ const GoalCard: React.FC<CardProps<GoalWCategory>> = ({ record: goal, onEdit, on
           {formatDate(goal.updatedAt)}
         </Text>
       </View>
-    </View>
+    </View >
   );
 };
 
@@ -174,11 +185,4 @@ const styles = StyleSheet.create({
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: colors.lightGray,
   },
-  menuItem: {
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.lightGray,
-  },
-  statusMenu: {
-    width: 200,
-  }
 });

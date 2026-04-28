@@ -143,9 +143,9 @@ class DatabaseFunctions {
         query += ` LIMIT ?`;
         values.push(pagination.limit);
 
-        if (pagination.offset !== undefined) {
+        if (pagination.offsetUnit !== undefined) {
           query += ` OFFSET ?`;
-          values.push(pagination.offset);
+          values.push(pagination.offsetUnit);
         }
       }
 
@@ -217,9 +217,9 @@ class DatabaseFunctions {
         dataQuery += ` LIMIT ?`;
         dataValues.push(pagination.limit);
 
-        if (pagination.offset !== undefined) {
+        if (pagination.offsetUnit !== undefined) {
           dataQuery += ` OFFSET ?`;
-          dataValues.push(pagination.offset);
+          dataValues.push(pagination.offsetUnit);
         }
       }
 

@@ -39,6 +39,11 @@ const Countdown: React.FC = () => {
   const endAtRef = useRef<number | null>(null);
   const fgIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const scheduleFinish = async (endAt: number) => {
+    await cancelAllTimerNotifications();
+    await scheduleTimerDoneNotification(endAt);
+  };
+
   const handleSaveLog = useCallback(async () => {
     try {
       const pts = parseInt(points, 10) || 0;
@@ -54,6 +59,24 @@ const Countdown: React.FC = () => {
     }
   }, [durationMs, points])
 
+  const finishCountdown = useCallback(async () => {
+    clearFgInterval();
+
+    setIsRunning(false);
+    setIsPaused(false);
+
+    endAtRef.current = null;
+
+    setRemainingMs(0);
+
+    await stopNativeCountdown();
+    await cancelAllTimerNotifications();
+
+    showNow('Time’s up!', 'Countdown finished.');
+
+    await handleSaveLog();
+  }, [handleSaveLog]);
+
   const startForegroundTick = useCallback(() => {
     if (fgIntervalRef.current) clearInterval(fgIntervalRef.current);
 
@@ -63,18 +86,12 @@ const Countdown: React.FC = () => {
         setRemainingMs(msLeft);
 
         if (msLeft <= 0) {
-          clearInterval(fgIntervalRef.current!);
-          fgIntervalRef.current = null;
-          setIsRunning(false);
-          setIsPaused(false);
-          endAtRef.current = null;
-
-          showNow('Time’s up!', 'Countdown finished.');
-          handleSaveLog();
+          clearFgInterval();
+          finishCountdown();
         }
       }
     }, 250);
-  }, [handleSaveLog]);
+  }, [finishCountdown,]);
 
   const clearFgInterval = () => {
     if (fgIntervalRef.current) clearInterval(fgIntervalRef.current);
@@ -94,6 +111,12 @@ const Countdown: React.FC = () => {
     requestNotifPermission();
   }, []);
 
+  useEffect(() => {
+    return () => {
+      clearFgInterval();
+    };
+  }, []);
+
   const progress = clamp(1 - remainingMs / Math.max(1, durationMs), 0, 1);
 
   const start = async () => {
@@ -104,8 +127,7 @@ const Countdown: React.FC = () => {
     setIsRunning(true);
     setIsPaused(false);
 
-    await cancelAllTimerNotifications();
-    await scheduleTimerDoneNotification(endAt);
+    await scheduleFinish(endAt);
 
     startForegroundTick();
     startNativeCountdown(remainingMs);
@@ -113,12 +135,16 @@ const Countdown: React.FC = () => {
 
   const pause = async () => {
     if (!isRunning || isPaused) return;
+
     setIsPaused(true);
+
     clearFgInterval();
+
     if (endAtRef.current) {
       setRemainingMs(Math.max(0, endAtRef.current - Date.now()));
       endAtRef.current = null;
     }
+
     await stopNativeCountdown();
     await cancelAllTimerNotifications();
   };
@@ -130,8 +156,7 @@ const Countdown: React.FC = () => {
     const endAt = Date.now() + remainingMs;
     endAtRef.current = endAt;
 
-    await cancelAllTimerNotifications();
-    await scheduleTimerDoneNotification(endAt);
+    await scheduleFinish(endAt);
 
     startForegroundTick();
     startNativeCountdown(remainingMs);
@@ -140,17 +165,20 @@ const Countdown: React.FC = () => {
   const stop = async () => {
     setIsRunning(false);
     setIsPaused(false);
+
     endAtRef.current = null;
+
     clearFgInterval();
+
     await stopNativeCountdown();
     await cancelAllTimerNotifications();
-
-    handleSaveLog();
 
     setRemainingMs(durationMs);
   };
 
   const onClockPress = () => {
+    if (isRunning || isPaused) return;
+
     const h = Math.floor(durationMs / 3600000);
     const m = Math.floor((durationMs % 3600000) / 60000);
     const s = Math.floor((durationMs % 60000) / 1000);
@@ -160,6 +188,7 @@ const Countdown: React.FC = () => {
     now.setMinutes(m);
     now.setSeconds(s);
     now.setMilliseconds(0);
+
     setPickerDate(now);
     setPickerVisible(true);
   };
@@ -187,7 +216,7 @@ const Countdown: React.FC = () => {
 
   return (
     <View style={[framework.bgBackground, framework.p4, framework.alignCenter, framework.flexOne]}>
-      <TouchableOpacity style={[framework.my3, framework.flexCenter]} onPress={onClockPress}>
+      <TouchableOpacity style={[framework.my3, framework.flexCenter]} onPress={onClockPress} disabled={isRunning || isPaused}>
         <Svg height="180" width="180" viewBox="0 0 180 180">
           <Circle cx="90" cy="90" r={R} stroke={colors.lightGray} strokeWidth="10" fill="none" />
           <Circle

@@ -1,4 +1,4 @@
-import { HabitType, RepeatInterval, Status } from "./variables";
+import { Status } from "./variables";
 
 export type Goal = {
   id: number;
@@ -58,37 +58,6 @@ export type TaskWithCategoryAndSubtasks = Task & {
   subtasks: Subtask[];
 };
 
-export type Habit = {
-  id: number;
-  title: string;
-  description?: string;
-  habitType: HabitType;
-  repeatInterval?: RepeatInterval;
-  customIntervalDays?: number;
-  repeatWeekDay?: number,
-  repeatMonthDay?: number,
-  deadline?: string;
-  categoryId?: number;
-  goalId?: number;
-  createdAt: string;
-  updatedAt: string;
-};
-
-export type HabitWithCategory = Habit & {
-  categoryName?: string,
-  categoryColor?: string;
-  goalName?: string,
-}
-
-export type HabitFetchedQuery = HabitWithCategory & {
-  goalCategoryName?: string,
-  goalCategoryColor?: string,
-  habitCategoryName?: string,
-  habitCategoryColor?: string
-  goalCategoryId?: string,
-};
-
-export type SafeHabit = Omit<Habit, 'id' | 'createdAt' | 'updatedAt'>;
 
 export type Challenge = {
   id: number;

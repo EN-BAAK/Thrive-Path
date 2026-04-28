@@ -1,9 +1,10 @@
-import { Category, Challenge, Goal, Habit, Task } from "./schemas";
+import { Category, Challenge, Goal, Task } from "./schemas";
+import { QueryKey } from "./variables";
 
 export type Modal = {
   visible: boolean,
   onClose: () => void,
-  onSave: () => void
+  queryKey: QueryKey[]
 }
 
 export type AddEditGoalModalProps = {
@@ -20,10 +21,6 @@ export type AddEditTaskModalProps = {
 
 export type AddSubtaskModalProps = {
   parentTaskId: number;
-} & Modal;
-
-export type AddEditHabitModalProps = {
-  initialHabit: Habit;
 } & Modal;
 
 export type AddEditChallengeModalProps = {

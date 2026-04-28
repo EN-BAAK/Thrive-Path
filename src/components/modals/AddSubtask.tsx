@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, View, Text, TouchableOpacity, TouchableWithoutFeedback, KeyboardAvoidingView } from 'react-native';
+import { View } from 'react-native';
 import { Formik } from 'formik';
 import framework from '../../styles/framework';
 import colors from '../../styles/colors';
@@ -9,90 +9,69 @@ import SwitchField from '../forms/SwitchField';
 import { SafeSubtask } from '../../types/schemas';
 import { addEditSubtaskValidation } from '../../constants/formValidation';
 import { defaultSubtask } from '../../constants/formValues';
-import { createSubtask } from '../../api/crud/tasks';
 import { AddSubtaskModalProps } from '../../types/modals';
 import Button from '../forms/Button';
-import { ScrollView } from 'react-native';
+import CUModalHolder from '../../layouts/CUModalHolder';
+import { useCreateSubTask } from '../../features/subtasks';
 
-const AddSubtaskModal: React.FC<AddSubtaskModalProps> = ({ visible, onClose, onSave, parentTaskId, }) => {
+const AddSubtaskModal: React.FC<AddSubtaskModalProps> = ({ visible, onClose, parentTaskId, queryKey: key }) => {
+  const { mutateAsync } = useCreateSubTask({ key })
+
   const handleSubmitSubtask = async (values: SafeSubtask) => {
-    try {
-      await createSubtask(values, parentTaskId);
-      onSave();
-      onClose();
-    } catch (error) {
-      console.error('[AddSubtaskModal] Failed to create subtask:', error);
-    }
+    mutateAsync({ subtask: values, parentTaskId })
+    onClose();
   };
 
   return (
-    <Modal animationType="slide" transparent visible={visible}>
-      <TouchableOpacity
-        activeOpacity={1}
-        style={[framework.bgLayout, framework.flexOne, framework.justifyCenter, framework.px3]}
-        onPress={onClose}
+    <CUModalHolder
+      onClose={onClose}
+      visible={visible}
+      title="Add Subtask"
+    >
+      <Formik<SafeSubtask>
+        initialValues={defaultSubtask}
+        validationSchema={addEditSubtaskValidation}
+        onSubmit={handleSubmitSubtask}
+        enableReinitialize
       >
-        <KeyboardAvoidingView behavior="height" style={framework.w100} keyboardVerticalOffset={0}>
-          <TouchableWithoutFeedback>
-            <View
-              style={[framework.bgBackground, framework.p4, framework.roundedMd, framework.shadowMedium,]}
-            >
-              <Text
-                style={[framework.bgMain, framework.mb4, framework.py2, framework.px4, framework.roundedBottomMd, framework.textCenter, framework.fontBold, framework.textXl, framework.reversedText,]}
-              >
-                Add Subtask
-              </Text>
+        {(formik) => (
+          <React.Fragment>
+            <InputField
+              name="title"
+              label="Title"
+              required
+              placeholder="Enter subtask title"
+              containerStyle={framework.mb2}
+            />
 
-              <ScrollView showsVerticalScrollIndicator={false}>
-                <Formik<SafeSubtask>
-                  initialValues={defaultSubtask}
-                  validationSchema={addEditSubtaskValidation}
-                  onSubmit={handleSubmitSubtask}
-                  enableReinitialize
-                >
-                  {(formik) => (
-                    <>
-                      <InputField
-                        name="title"
-                        label="Title"
-                        required
-                        placeholder="Enter subtask title"
-                        containerStyle={framework.mb2}
-                      />
+            <SwitchField
+              name="isImportant"
+              label="Important?"
+              containerStyle={framework.mb2}
+              trackColor={{ true: Variables.lightMain, false: Variables.secondaryColor }}
+              thumbColor={{ true: Variables.mainColor, false: colors.gray }}
+            />
 
-                      <SwitchField
-                        name="isImportant"
-                        label="Important?"
-                        containerStyle={framework.mb2}
-                        trackColor={{ true: Variables.lightMain, false: Variables.secondaryColor }}
-                        thumbColor={{ true: Variables.mainColor, false: colors.gray }}
-                      />
+            <SwitchField
+              name="isCompleted"
+              label="Completed?"
+              containerStyle={framework.mb3}
+              trackColor={{ true: colors.success, false: Variables.secondaryColor }}
+              thumbColor={{ true: colors.success, false: colors.gray }}
+            />
 
-                      <SwitchField
-                        name="isCompleted"
-                        label="Completed?"
-                        containerStyle={framework.mb3}
-                        trackColor={{ true: colors.success, false: Variables.secondaryColor }}
-                        thumbColor={{ true: colors.success, false: colors.gray }}
-                      />
-
-                      <View style={[framework.flexRow, framework.justifyEnd]}>
-                        <Button
-                          msg='Save'
-                          onPress={() => formik.handleSubmit()}
-                          style={[framework.px5, framework.rounded]}
-                          disabled={!formik.dirty || formik.isSubmitting || !formik.isValid}
-                        />
-                      </View>
-                    </>
-                  )}
-                </Formik>
-              </ScrollView>
+            <View style={[framework.flexRow, framework.justifyEnd]}>
+              <Button
+                msg='Save'
+                onPress={() => formik.handleSubmit()}
+                style={[framework.px5, framework.rounded]}
+                disabled={!formik.dirty || formik.isSubmitting || !formik.isValid}
+              />
             </View>
-          </TouchableWithoutFeedback>
-        </KeyboardAvoidingView>
-      </TouchableOpacity>
-    </Modal>
+          </React.Fragment>
+        )}
+      </Formik>
+    </CUModalHolder>
   );
 };
 

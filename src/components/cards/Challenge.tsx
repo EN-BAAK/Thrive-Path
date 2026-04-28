@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import AntDesign from 'react-native-vector-icons/AntDesign';
@@ -8,41 +8,49 @@ import { Challenge } from '../../types/schemas';
 import colors from '../../styles/colors';
 import framework from '../../styles/framework';
 import Variables from '../../styles/variables';
-import { addStar, deleteChallenge, deleteHeart, updateChallengeCompletedById } from '../../api/crud/challenges';
 import { formatDate } from '../../misc/helpers';
+import { useAddStart, useDeleteChallenge, useLoseHeart } from '../../features/challenges';
+import { useAppContext } from '../../contexts/AppProvider';
+import { Menu } from 'react-native-paper';
 
-const ChallengeCard: React.FC<CardProps<Challenge>> = ({ record: challenge, onEdit, onSuccess }) => {
-  const [menuVisible, setMenuVisible] = useState(false);
+const ChallengeCard: React.FC<CardProps<Challenge>> = ({ record: challenge, onEdit, queryKey: key }) => {
+  const [actionMenuVisible, setActionMenuVisible] = useState(false);
+
+  const { showWarning } = useAppContext()
+
+  const { mutateAsync: deleteMutateAsync } = useDeleteChallenge({ key })
+  const { mutateAsync: loseHeartMutateAsync } = useLoseHeart({ key })
+  const { mutateAsync: addStarMutateAsync } = useAddStart({ key })
+
+  const onActionMenuClose = () => {
+    setActionMenuVisible(false)
+  }
+
+  const onActionMenuOpen = () => {
+    setActionMenuVisible(true)
+  }
 
   const handleDelete = async () => {
-    try {
-      await deleteChallenge(challenge.id);
-      onSuccess?.();
-    } catch {
-      console.log('[Challenge] Failed to delete challenge');
-    } finally {
-      setMenuVisible(false);
-    }
-  };
-
-  const toggleCompleted = async () => {
-    try {
-      updateChallengeCompletedById(challenge.id, !challenge.isCompleted)
-      onSuccess?.();
-    } catch {
-      console.log('[Challenge] Failed to toggle completion');
-    }
+    showWarning({
+      btn2: "delete",
+      btn1: "cancel",
+      handleBtn2: async () => await deleteMutateAsync(challenge.id),
+      message: `Are you sure you want to delete the challenge "${challenge.title}"?`
+    })
   };
 
   const loseHeart = async () => {
-    await deleteHeart(challenge.id);
-    onSuccess?.();
+    await loseHeartMutateAsync(challenge.id);
   };
 
   const increaseStars = async () => {
-    await addStar(challenge.id);
-    onSuccess?.();
+    await addStarMutateAsync(challenge.id);
   };
+
+  const handleEdit = () => {
+    onActionMenuClose()
+    onEdit && onEdit()
+  }
 
   const isHeartsExists: boolean = Boolean(challenge.maxHearts && challenge.maxHearts > 0);
   const isStarsExists: boolean = Boolean(challenge.maxStars && challenge.maxStars > 0);
@@ -54,34 +62,29 @@ const ChallengeCard: React.FC<CardProps<Challenge>> = ({ record: challenge, onEd
         style={[framework.p4, framework.pb2]}
       >
         <View style={[framework.flexRow, framework.justifyBetween, framework.alignCenter]}>
-          <TouchableOpacity onPress={toggleCompleted} style={[framework.mr2]}>
-            <FontAwesome5
-              name={challenge.isCompleted ? 'check-circle' : 'circle'}
-              size={20}
-              color={Variables.reversedTextColor}
-            />
-          </TouchableOpacity>
-
           <Text style={[framework.fontBold, framework.textLg, framework.reversedText, framework.flexOne]}>
             {challenge.title}
           </Text>
 
-          <View style={[framework.flexRow, framework.alignCenter, framework.gap3]}>
-            <TouchableOpacity onPress={() => setMenuVisible(prev => !prev)} hitSlop={10}>
-              <FontAwesome5 name="ellipsis-v" size={16} color={Variables.reversedTextColor} />
-            </TouchableOpacity>
-
-            {menuVisible && (
-              <View style={[framework.bgBackground, framework.rounded, framework.shadowLight, framework.absolute, framework.top0, framework.right4, framework.index1, framework.overflowHidden]}>
-                <TouchableOpacity onPress={onEdit} style={[styles.menuItem, framework.py2, framework.px4]}>
-                  <Text style={framework.text}>Edit</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={handleDelete} style={[styles.menuItem, framework.py2, framework.px4]}>
-                  <Text style={framework.text}>Delete</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-          </View>
+          <Menu
+            anchor={
+              <TouchableOpacity onPress={onActionMenuOpen} hitSlop={10}>
+                <FontAwesome5 name="ellipsis-v" size={16} color={Variables.reversedTextColor} />
+              </TouchableOpacity>
+            }
+            visible={actionMenuVisible}
+            onDismiss={onActionMenuClose}
+            contentStyle={[framework.bgBackground]}
+          >
+            <View>
+              <TouchableOpacity onPress={handleEdit} style={[framework.py2, framework.px4, framework.borderBottom]}>
+                <Text style={[framework.text]}>Edit</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleDelete} style={[framework.py2, framework.px4]}>
+                <Text style={[framework.text]}>Delete</Text>
+              </TouchableOpacity>
+            </View>
+          </Menu>
         </View>
 
         {challenge.description && (
@@ -148,10 +151,3 @@ const ChallengeCard: React.FC<CardProps<Challenge>> = ({ record: challenge, onEd
 };
 
 export default ChallengeCard;
-
-const styles = StyleSheet.create({
-  menuItem: {
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.lightGray,
-  },
-});
