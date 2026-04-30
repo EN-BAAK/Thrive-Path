@@ -63,7 +63,6 @@ export type Challenge = {
   id: number;
   title: string;
   description?: string;
-  targetValue?: number;
   startDate: string;
   endDate: string;
   maxHearts?: number;

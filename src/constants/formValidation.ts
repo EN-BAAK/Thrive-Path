@@ -78,10 +78,6 @@ export const addEditChallengeValidation = Yup.object().shape({
     .max(500, 'Description must be at most 500 characters')
     .nullable(),
 
-  targetValue: Yup.number()
-    .required('Target value is required')
-    .min(1, 'Target value must be at least 1'),
-
   maxHearts: Yup.number()
     .required('Max hearts are required')
     .min(0, 'Max hearts must be at least 0'),

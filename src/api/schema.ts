@@ -9,14 +9,12 @@ export const initializeDatabase = async () => {
   // await db.executeAsync(`DROP INDEX IF EXISTS idx_tasks_title;`);
   // await db.executeAsync(`DROP INDEX IF EXISTS idx_subtasks_title;`);
   // await db.executeAsync(`DROP INDEX IF EXISTS idx_challenges_title;`);
-  // await db.executeAsync(`DROP INDEX IF EXISTS idx_timer_logs_type;`);
 
   // await db.executeAsync(`DROP TABLE IF EXISTS goals;`);
   // await db.executeAsync(`DROP TABLE IF EXISTS tasks;`);
   // await db.executeAsync(`DROP TABLE IF EXISTS subtasks;`);
   // await db.executeAsync(`DROP TABLE IF EXISTS categories;`);
   // await db.executeAsync(`DROP TABLE IF EXISTS challenges;`);
-  // await db.executeAsync(`DROP TABLE IF EXISTS timer_logs;`);
 
   await db.executeAsync(`
     CREATE TABLE IF NOT EXISTS categories (
@@ -74,7 +72,6 @@ export const initializeDatabase = async () => {
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     title TEXT NOT NULL,
     description TEXT,
-    targetValue INTEGER,
     startDate TEXT NOT NULL,
     endDate TEXT NOT NULL,
     maxHearts INTEGER DEFAULT 0,
@@ -89,15 +86,6 @@ export const initializeDatabase = async () => {
   );
 `);
 
-  await db.executeAsync(`
-    CREATE TABLE IF NOT EXISTS timer_logs (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      duration TEXT NOT NULL,
-      type TEXT NOT NULL,
-      description TEXT
-    );
-  `);
-
   await db.executeAsync(`CREATE INDEX IF NOT EXISTS idx_goals_name ON goals(name);`);
   await db.executeAsync(`CREATE INDEX IF NOT EXISTS idx_goals_priority ON goals(priority);`);
 
@@ -107,8 +95,6 @@ export const initializeDatabase = async () => {
   await db.executeAsync(`CREATE INDEX IF NOT EXISTS idx_subtasks_title ON subtasks(title);`);
 
   await db.executeAsync(`CREATE INDEX IF NOT EXISTS idx_challenges_title ON challenges(title);`);
-
-  await db.executeAsync(`CREATE INDEX IF NOT EXISTS idx_timer_logs_type ON timer_logs(type);`);
 
   return db;
 };

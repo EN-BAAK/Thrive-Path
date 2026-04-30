@@ -81,14 +81,6 @@ const AddEditChallengeModal: React.FC<AddEditChallengeModalProps> = ({ visible, 
             />
 
             <InputField
-              name="targetValue"
-              label="Target Value"
-              required
-              type="numeric"
-              placeholder="e.g. 20 workouts"
-            />
-
-            <InputField
               name="maxHearts"
               label="Max Hearts"
               required

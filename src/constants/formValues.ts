@@ -42,7 +42,6 @@ export const defaultChallenge: Challenge = {
   id: -1,
   title: '',
   description: '',
-  targetValue: 0,
   maxHearts: 0,
   maxStars: 0,
   currentHearts: 0,
